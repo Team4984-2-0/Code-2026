@@ -2,9 +2,6 @@ package frc.robot;
 
 import java.util.List;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -56,7 +53,7 @@ public class RobotContainer {
         public RobotContainer() {
       
 
-                autoChooser = AutoBuilder.buildAutoChooser();
+                autoChooser = null;
 
                 SmartDashboard.putData("Auto Chooser", autoChooser);
 
