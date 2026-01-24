@@ -1,4 +1,13 @@
 package frc.robot.commands;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.util.PathPlannerLogging;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -84,6 +93,8 @@ public class SwerveJoystickCmd extends Command {
         
          // if (fieldOrientedFunction.get()) {
             // Relative to field
+            chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                    xSpeed, ySpeed, turningSpeed, swerveSubsystem.getRotation2d());
    /*      } else { 
                 
             // Relative to robot
@@ -92,8 +103,10 @@ public class SwerveJoystickCmd extends Command {
         
 
         // 5. Convert chassis speeds to individual module states
+        SwerveModuleState[] moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
 
         // 6. Output each module states to wheels
+        swerveSubsystem.setModuleStates(moduleStates);
     }
 
     

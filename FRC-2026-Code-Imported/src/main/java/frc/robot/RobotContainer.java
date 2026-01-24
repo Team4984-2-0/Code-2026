@@ -2,6 +2,9 @@ package frc.robot;
 
 import java.util.List;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -34,13 +37,35 @@ import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.cscore.VideoSink;
 import edu.wpi.first.cscore.VideoSource;
 import edu.wpi.first.cscore.VideoSource;
+
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Launcher;
+import frc.robot.subsystems.Elevator;
+
+import frc.robot.subsystems.Arm;
+
+
+
+
 import frc.robot.commands.Launch;
+
+
 import frc.robot.commands.Intake;
+
+
+
+
 public class RobotContainer {
 
         private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
       
+        private final Climber climber = new Climber();
+  
+
+        private final Arm arm = new Arm();
+
+        private final Elevator elevator = new Elevator();
+
         private final Launcher launcher = new Launcher();
         
         private final SendableChooser<Command> autoChooser;
@@ -51,9 +76,15 @@ public class RobotContainer {
         SendableChooser<Command> m_Chooser = new SendableChooser<>();
 
         public RobotContainer() {
-      
+          
+                NamedCommands.registerCommand("LimelightAuto", (new SwerveJoystickCmd(
+                                swerveSubsystem,
+                                () -> -driverJoytick.getRawAxis(OIConstants.kDriverYAxis),
+                                () -> -driverJoytick.getRawAxis(OIConstants.kDriverXAxis),
+                                () -> LimelightHelpers.getTX("limelight") *-0.5,
+                                () -> !driverJoytick.getRawButton(OIConstants.kDriverFieldOrientedButtonIdx))));
 
-                autoChooser = null;
+                autoChooser = AutoBuilder.buildAutoChooser();
 
                 SmartDashboard.putData("Auto Chooser", autoChooser);
 
@@ -92,12 +123,24 @@ public class RobotContainer {
 
         private void configureButtonBindings () {
                 new JoystickButton(driverJoytick, 2).whileTrue(new resetheading(swerveSubsystem));
-              
                 // Launch
-                new JoystickButton(operatorJoytick, 8).whileTrue(new Launch(launcher));
+                new JoystickButton(operatorJoytick, 6).whileTrue(new Launch(launcher));
                 new JoystickButton(operatorJoytick, 7).whileTrue(new Intake(launcher));
+                new JoystickButton(driverJoytick, 3).whileTrue(new SwerveJoystickCmd(
+                                swerveSubsystem,
+                                () -> -driverJoytick.getRawAxis(OIConstants.kDriverYAxis),
+                                () -> -driverJoytick.getRawAxis(OIConstants.kDriverXAxis),
+                                () -> LimelightHelpers.getTX("limelight") *-0.5,
+                                () -> !driverJoytick.getRawButton(OIConstants.kDriverFieldOrientedButtonIdx)));
 
+/*8 
+                new JoystickButton(operatorJoytick, 8).whileTrue(new Climb(climber));
+                new JoystickButton(operatorJoytick, 7).whileTrue(new Climbbutback(climber));
 
+                new JoystickButton(operatorJoytick, 1).whileTrue(new ElevatorAutoL2(elevator));
+               
+              // XboxController.Button.
+               // new JoystickButton(operatorJoytick, 7).whileTrue(new Launch(launcher)); */
                
         }
 

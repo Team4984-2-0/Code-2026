@@ -1,4 +1,15 @@
 package frc.robot.subsystems;
+
+import com.pathplanner.lib.config.RobotConfig;
+import com.studica.frc.AHRS;
+import com.studica.frc.AHRS.NavXComType;
+
+import edu.wpi.first.wpilibj.SPI;
+
+import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -13,7 +24,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.UnitConversions;
-
+import com.pathplanner.lib.config.PIDConstants;
 public class SwerveSubsystem extends SubsystemBase {
     private final SwerveModule frontLeft = new SwerveModule(
             DriveConstants.kFrontLeftDriveMotorPort,
@@ -52,6 +63,7 @@ public class SwerveSubsystem extends SubsystemBase {
             DriveConstants.kBackRightDriveAbsoluteEncoderReversed);
 
 
+    private final AHRS gyro = new AHRS(NavXComType.kMXP_SPI); //AHRS(SPI.Port.kMXP);
 
     //private final ADXRS450_Gyro gyro = new ADXRS450_Gyro();
     private final SwerveModule[] modules = {frontLeft,frontRight,backLeft,backRight};
@@ -74,6 +86,7 @@ public class SwerveSubsystem extends SubsystemBase {
     private final SwerveDriveOdometry odometer = new SwerveDriveOdometry(DriveConstants.kDriveKinematics,
             new Rotation2d(0), WheelPositions, startingPosition);
     private SwerveDriveKinematics kinematics = DriveConstants.kDriveKinematics;
+    RobotConfig configs;
     public SwerveSubsystem() {
         
       // All other subsystem initialization
@@ -83,17 +96,41 @@ public class SwerveSubsystem extends SubsystemBase {
     // store this in your Constants file
       
     try{
+      configs = RobotConfig.fromGUISettings();
     } catch (Exception e) {
       // Handle exception as needed
       e.printStackTrace();
     }
 
     // Configure AutoBuilder last
-    
-       
+    AutoBuilder.configure(
+            this::getPose, // Robot pose supplier
+            this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
+            this::getSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+            (speeds, feedforwards) -> driveRobotRelative(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
+            new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
+                    new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+                    new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+            ),
+            configs, // The robot configuration
+            () -> {
+              // Boolean supplier that controls when the path will be mirrored for the red alliance
+              // This will flip the path being followed to the red side of the field.
+              // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+              var alliance = DriverStation.getAlliance();
+              if (alliance.isPresent()) {
+                return alliance.get() == DriverStation.Alliance.Red;
+              }
+              return false;
+            },
+            this // Reference to this subsystem to set requirements
+    );
+        
         new Thread(() -> {
             try {
                 Thread.sleep(1000);
+                zeroHeading();
             } catch (Exception e) {
             }
         }).start();
@@ -112,6 +149,10 @@ public class SwerveSubsystem extends SubsystemBase {
     
     }
     
+      public void resetPose(Pose2d pose) {
+        System.out.println(pose);
+        odometer.resetPosition(gyro.getRotation2d(), getPositions(), pose);
+      }
     
       public ChassisSpeeds getSpeeds() {
         return kinematics.toChassisSpeeds(getModuleStates());
@@ -151,16 +192,25 @@ public class SwerveSubsystem extends SubsystemBase {
         return WheelPositions;
       }
 
-    
+    public void zeroHeading() {
+        gyro.reset();
+    }
 
-  
-   
+    public double getHeading() {
+        return Math.IEEEremainder(-gyro.getAngle(), 360);
+    }
+        
+    public Rotation2d getRotation2d() {
+        return Rotation2d.fromDegrees(getHeading());
+    }
 
     public Pose2d getPose() {
         return odometer.getPoseMeters();
     }
 
- 
+    public void resetpose(Pose2d pose) {
+        odometer.resetPosition(getRotation2d(), WheelPositions, pose);
+    }
 
     @Override
     public void periodic() {
@@ -177,8 +227,10 @@ public class SwerveSubsystem extends SubsystemBase {
         WheelPositions[3].distanceMeters =  backRight.getDrivePosition();
         
 
+        odometer.update(getRotation2d(), WheelPositions);
         SmartDashboard.putData("Field",myfield);
         myfield.setRobotPose(odometer.getPoseMeters());
+        SmartDashboard.putNumber("Robot Heading", getHeading());
         SmartDashboard.putString("Robot Location", getPose().getTranslation().toString());
         SmartDashboard.putNumber("odometer X", getPose().getX());
         SmartDashboard.putNumber("odometer Y", getPose().getY());

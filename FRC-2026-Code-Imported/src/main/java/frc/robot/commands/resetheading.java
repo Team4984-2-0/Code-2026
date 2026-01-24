@@ -17,6 +17,10 @@ public class resetheading extends Command {
         
     }
 
+    @Override
+    public void execute() {
+        swerveSubsystem.zeroHeading();
+    }
 
     @Override
     public void end(boolean interrupted) {
