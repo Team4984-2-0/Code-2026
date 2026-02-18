@@ -68,6 +68,7 @@ public class RobotContainer {
 
         private final Launcher launcher = new Launcher();
         
+        
         private final SendableChooser<Command> autoChooser;
 
         private final Joystick driverJoytick = new Joystick(OIConstants.kDriverControllerPort);
@@ -77,12 +78,7 @@ public class RobotContainer {
 
         public RobotContainer() {
           
-                NamedCommands.registerCommand("LimelightAuto", (new SwerveJoystickCmd(
-                                swerveSubsystem,
-                                () -> -driverJoytick.getRawAxis(OIConstants.kDriverYAxis),
-                                () -> -driverJoytick.getRawAxis(OIConstants.kDriverXAxis),
-                                () -> LimelightHelpers.getTX("limelight") *-0.5,
-                                () -> !driverJoytick.getRawButton(OIConstants.kDriverFieldOrientedButtonIdx))));
+                
 
                 autoChooser = AutoBuilder.buildAutoChooser();
 
@@ -124,13 +120,13 @@ public class RobotContainer {
         private void configureButtonBindings () {
                 new JoystickButton(driverJoytick, 2).whileTrue(new resetheading(swerveSubsystem));
                 // Launch
-                new JoystickButton(operatorJoytick, 6).whileTrue(new Launch(launcher));
-                new JoystickButton(operatorJoytick, 7).whileTrue(new Intake(launcher));
+             //   new JoystickButton(operatorJoytick, 6).whileTrue(new Launch(launcher));
+               // new JoystickButton(operatorJoytick, 7).whileTrue(new Intake(launcher));
                 new JoystickButton(driverJoytick, 3).whileTrue(new SwerveJoystickCmd(
                                 swerveSubsystem,
                                 () -> -driverJoytick.getRawAxis(OIConstants.kDriverYAxis),
                                 () -> -driverJoytick.getRawAxis(OIConstants.kDriverXAxis),
-                                () -> LimelightHelpers.getTX("limelight") *-0.5,
+                                () -> LimelightHelpers.getTX("limelight") *-0.019,
                                 () -> !driverJoytick.getRawButton(OIConstants.kDriverFieldOrientedButtonIdx)));
 
 /*8 
