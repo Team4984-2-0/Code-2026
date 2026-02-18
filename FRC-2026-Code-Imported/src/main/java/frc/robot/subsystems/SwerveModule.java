@@ -38,7 +38,7 @@ public class SwerveModule {
         this.absoluteEncoderReversed = absoluteEncoderReversed;
         absoluteEncoder = new AnalogInput(absoluteEncoderId);
         speed = true;
-        power = 1;
+        power = 3;
         driveMotor = new SparkMax(driveMotorId, MotorType.kBrushless);
         turningMotor = new SparkMax(turningMotorId, MotorType.kBrushless);
 
@@ -48,7 +48,7 @@ public class SwerveModule {
         SparkMaxConfig driveConfig = new SparkMaxConfig();
         SparkMaxConfig turnConfig = new SparkMaxConfig();
 
-        driveConfig.idleMode(SparkBaseConfig.IdleMode.kCoast);
+        driveConfig.idleMode(SparkBaseConfig.IdleMode.kBrake);
         driveConfig.encoder.positionConversionFactor(ModuleConstants.kDriveEncoderRot2Meter);
         driveConfig.encoder.velocityConversionFactor(ModuleConstants.kDriveEncoderRPM2MeterPerSec);
         driveConfig.inverted(driveMotorReversed);

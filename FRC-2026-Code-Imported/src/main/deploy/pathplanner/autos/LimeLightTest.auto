@@ -7,13 +7,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "TestRun"
+            "pathName": "1"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "LimelightAuto"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 5.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "2"
           }
         }
       ]
