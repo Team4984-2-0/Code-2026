@@ -35,7 +35,7 @@ public class Launcher extends SubsystemBase {
     }
 
 public void Spin(double value) {
-         SmartDashboard.putNumber("encoder arm", get_encoder());
+        
 
     motor4.set(-value);
 }
