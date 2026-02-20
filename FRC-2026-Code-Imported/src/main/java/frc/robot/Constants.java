@@ -31,7 +31,6 @@ import edu.wpi.first.math.util.Units;
 public class Constants {
         public static final int CAMERA1_FPS = 30;
         public static final int CAMERA1_BRIGHTNESS = 50;
-        public static final String Swerve = null;
     public static final class ModuleConstants {
         public static final double kWheelDiameterMeters = Units.inchesToMeters(4);
         public static final double kDriveMotorGearRatio = 1 / 5.8462;
@@ -127,10 +126,6 @@ public class Constants {
         public static final int kDriverFieldOrientedButtonIdx = 1;
 
         public static final double kDeadband = 0.1;
-    }
-    
-    public static final class UnitConversions {
-        public static final double feetToMeters = 3.28084;
     }
 }
 

@@ -24,7 +24,6 @@ public class SwerveModule {
 
     private final PIDController turningPidController;
     private int power;
-    private boolean speed;
 
     // what does this look like
     private final AnalogInput absoluteEncoder;
@@ -37,7 +36,6 @@ public class SwerveModule {
         this.absoluteEncoderOffsetRad = absoluteEncoderOffset;
         this.absoluteEncoderReversed = absoluteEncoderReversed;
         absoluteEncoder = new AnalogInput(absoluteEncoderId);
-        speed = true;
         power = 3;
         driveMotor = new SparkMax(driveMotorId, MotorType.kBrushless);
         turningMotor = new SparkMax(turningMotorId, MotorType.kBrushless);
@@ -100,12 +98,6 @@ public class SwerveModule {
         return angle * (absoluteEncoderReversed ? -1.0 : 1.0);
     }
 
-    public double getAbsoluteEncoderRadtest() {
-        double angle = absoluteEncoder.getVoltage() / RobotController.getVoltage5V();
-        angle *= 2.0 * Math.PI;
-        return angle;
-    }
-
     public void resetEncoders() {
         driveEncoder.setPosition(0);
         //SmartDashboard.putNumber("encoder" + absoluteEncoder.getChannel() + " absolute before reset", getAbsoluteEncoderRad());
@@ -135,12 +127,6 @@ public class SwerveModule {
                 driveMotor.set((state.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeedMetersPerSecond)/2);
                 break;
         }
-/*         if (speed) {
-            driveMotor.set((state.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeedMetersPerSecond)/1.3);
-        }
-        else {
-            driveMotor.set((state.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeedMetersPerSecond)/2);
-        } */
         turningMotor.set(turningPidController.calculate(getTurningPosition(), state.angle.getRadians()));
       //  SmartDashboard.putString("Swerve[" + absoluteEncoder.getChannel() + "] state", state.toString());
        // SmartDashboard.putNumber("encoder" + absoluteEncoder.getChannel() + " live", getAbsoluteEncoderRad());

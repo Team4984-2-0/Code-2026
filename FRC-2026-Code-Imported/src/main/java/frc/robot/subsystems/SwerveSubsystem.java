@@ -4,12 +4,8 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
 
-import edu.wpi.first.wpilibj.SPI;
-
-import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -21,9 +17,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.UnitConversions;
 import com.pathplanner.lib.config.PIDConstants;
 public class SwerveSubsystem extends SubsystemBase {
     private final SwerveModule frontLeft = new SwerveModule(
@@ -206,10 +200,6 @@ public class SwerveSubsystem extends SubsystemBase {
 
     public Pose2d getPose() {
         return odometer.getPoseMeters();
-    }
-
-    public void resetpose(Pose2d pose) {
-        odometer.resetPosition(getRotation2d(), WheelPositions, pose);
     }
 
     @Override
