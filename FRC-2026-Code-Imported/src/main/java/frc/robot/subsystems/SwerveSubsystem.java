@@ -1,15 +1,15 @@
 package frc.robot.subsystems;
 
+/**
+ * Owns the four swerve modules, NavX heading source, and all odometry/helper
+ * utilities required for field-relative driving and PathPlanner autos.
+ */
+
 import com.pathplanner.lib.config.RobotConfig;
 import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
-
-import edu.wpi.first.wpilibj.SPI;
-
-import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -21,9 +21,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.UnitConversions;
 import com.pathplanner.lib.config.PIDConstants;
 public class SwerveSubsystem extends SubsystemBase {
     private final SwerveModule frontLeft = new SwerveModule(
@@ -70,7 +68,8 @@ public class SwerveSubsystem extends SubsystemBase {
 
     
 
-    private Field2d myfield;
+  /** Field visualization published to Shuffleboard. */
+  private Field2d myfield;
     private SwerveModulePosition frontleftpos = new SwerveModulePosition (frontLeft.getDrivePosition(),frontLeft.getState().angle);
     private SwerveModulePosition frontrightpos = new SwerveModulePosition (frontRight.getDrivePosition(),frontRight.getState().angle);
     private SwerveModulePosition backLeftpos = new SwerveModulePosition (backLeft.getDrivePosition(),backLeft.getState().angle);
@@ -87,7 +86,8 @@ public class SwerveSubsystem extends SubsystemBase {
             new Rotation2d(0), WheelPositions, startingPosition);
     private SwerveDriveKinematics kinematics = DriveConstants.kDriveKinematics;
     RobotConfig configs;
-    public SwerveSubsystem() {
+  /** Configures modules, odometry, and auto builder hooks. */
+  public SwerveSubsystem() {
         
       // All other subsystem initialization
     // ...
@@ -149,11 +149,13 @@ public class SwerveSubsystem extends SubsystemBase {
     
     }
     
+      /** Hard-resets odometry to a supplied pose (used when a path starts elsewhere). */
       public void resetPose(Pose2d pose) {
         System.out.println(pose);
         odometer.resetPosition(gyro.getRotation2d(), getPositions(), pose);
       }
     
+      /** Returns current chassis speeds derived from module states. */
       public ChassisSpeeds getSpeeds() {
         return kinematics.toChassisSpeeds(getModuleStates());
       }
@@ -162,6 +164,7 @@ public class SwerveSubsystem extends SubsystemBase {
         driveRobotRelative(ChassisSpeeds.fromFieldRelativeSpeeds(fieldRelativeSpeeds, getPose().getRotation()));
       }
     
+      /** Core drive helper used by both teleop and AutoBuilder. */
       public void driveRobotRelative(ChassisSpeeds robotRelativeSpeeds) {
         ChassisSpeeds targetSpeeds = ChassisSpeeds.discretize(robotRelativeSpeeds, 0.02);
     
@@ -171,6 +174,7 @@ public class SwerveSubsystem extends SubsystemBase {
         setModuleStates(targetStates);
       }
     
+      /** Convenience wrapper that also updates the field widget. */
       public void setStates(SwerveModuleState[] targetStates) {
         myfield.setRobotPose(odometer.getPoseMeters());
         SwerveDriveKinematics.desaturateWheelSpeeds(targetStates, DriveConstants.kPhysicalMaxSpeedMetersPerSecond);
@@ -192,11 +196,13 @@ public class SwerveSubsystem extends SubsystemBase {
         return WheelPositions;
       }
 
-    public void zeroHeading() {
+  /** Zeroes the NavX yaw reading (used when drivers press reset heading). */
+  public void zeroHeading() {
         gyro.reset();
     }
 
-    public double getHeading() {
+  /** Returns the wrapped yaw angle from the NavX so values stay within +/-180. */
+  public double getHeading() {
         return Math.IEEEremainder(-gyro.getAngle(), 360);
     }
         
@@ -204,7 +210,8 @@ public class SwerveSubsystem extends SubsystemBase {
         return Rotation2d.fromDegrees(getHeading());
     }
 
-    public Pose2d getPose() {
+  /** Latest fused pose from WPILib odometry. */
+  public Pose2d getPose() {
         return odometer.getPoseMeters();
     }
 
@@ -212,8 +219,8 @@ public class SwerveSubsystem extends SubsystemBase {
         odometer.resetPosition(getRotation2d(), WheelPositions, pose);
     }
 
-    @Override
-    public void periodic() {
+  @Override
+  public void periodic() {
         WheelPositions[0].angle =  frontLeft.getState().angle;
         WheelPositions[0].distanceMeters =  frontLeft.getDrivePosition();
 
@@ -236,14 +243,16 @@ public class SwerveSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("odometer Y", getPose().getY());
     }
     
-    public void stopModules() {
+  /** Immediately halts all swerve modules. */
+  public void stopModules() {
         frontLeft.stop();
         frontRight.stop();
         backLeft.stop();
         backRight.stop();
     }
 
-    public void setModuleStates(SwerveModuleState[] desiredStates) {
+  /** Applies desired module states after desaturating wheel speeds. */
+  public void setModuleStates(SwerveModuleState[] desiredStates) {
         //TBD.NeedsARealFixButEliminatesCompileErrors
         SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveConstants.kPhysicalMaxSpeedMetersPerSecond);
         

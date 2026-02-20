@@ -1,4 +1,6 @@
 package frc.robot.commands;
+
+/** Timed auto routine for spinning the arm shooter for a brief window. */
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Arm;
 
@@ -8,6 +10,7 @@ public class ShootAuto extends Command {
         private boolean Finished = false;
 
         
+        /** Stores arm reference and registers requirement. */
         public ShootAuto(Arm intakesub){
             this.intakesub = intakesub;
             addRequirements(intakesub);

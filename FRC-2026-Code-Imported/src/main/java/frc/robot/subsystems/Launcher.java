@@ -1,14 +1,12 @@
 package frc.robot.subsystems;
 
-import frc.robot.commands.*;
+/** Handles the single-motor launcher used for scoring notes. */
+
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.*;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -22,6 +20,7 @@ public class Launcher extends SubsystemBase {
 
 
 
+    /** Sets up the shooter motor, encoder, and PID placeholder. */
     public Launcher() {
         motor4 = new SparkMax(12, MotorType.kBrushless);
 
@@ -34,17 +33,20 @@ public class Launcher extends SubsystemBase {
        
     }
 
+/** Spins the launcher motor at the given percent output. */
 public void Spin(double value) {
          SmartDashboard.putNumber("encoder arm", get_encoder());
 
     motor4.set(-value);
 }
 
+/** Stops the launcher motor. */
 public void Spin() {
     motor4.set(0);
    
 }
 
+/** @return shooter encoder position for logging. */
 public double get_encoder(){
     return motor1Encoder.getPosition();
 }
