@@ -23,8 +23,8 @@ import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.commands.resetheading;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Launcher;
-import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.Arm;
+
+import frc.robot.subsystems.Intake;
 
 public class RobotContainer {
 
@@ -33,17 +33,12 @@ public class RobotContainer {
       
   /** Placeholder climber subsystem (bindings can be re-enabled later). */
         private final Climber climber = new Climber();
-  
 
   /** Articulated arm for scoring/collecting pieces. */
-        private final Arm arm = new Arm();
-
-  /** Elevator stage that repositions the arm/launcher. */
-        private final Elevator elevator = new Elevator();
+        private final Intake intake = new Intake();
 
   /** Launcher/shooter for game-specific notes. */
-        private final Launcher launcher = new Launcher();
-        
+        private final Launcher launcher = new Launcher(); 
         
   /** Shuffleboard chooser for PathPlanner-generated autos. */
         private final SendableChooser<Command> autoChooser;
@@ -106,25 +101,15 @@ public class RobotContainer {
    */
   private void configureButtonBindings () {
                 new JoystickButton(driverJoytick, 2).whileTrue(new resetheading(swerveSubsystem));
-                // Launch
-             //   new JoystickButton(operatorJoytick, 6).whileTrue(new Launch(launcher));
-               // new JoystickButton(operatorJoytick, 7).whileTrue(new Intake(launcher));
+                //new JoystickButton(operatorJoytick, 6).whileTrue(new Launch(launcher));
+                //new JoystickButton(operatorJoytick, 7).whileTrue(new Intake(launcher));
                 new JoystickButton(driverJoytick, 3).whileTrue(new SwerveJoystickCmd(
                                 swerveSubsystem,
                                 () -> -driverJoytick.getRawAxis(OIConstants.kDriverYAxis),
                                 () -> -driverJoytick.getRawAxis(OIConstants.kDriverXAxis),
                                 () -> LimelightHelpers.getTX("limelight") *-0.019,
                                 () -> !driverJoytick.getRawButton(OIConstants.kDriverFieldOrientedButtonIdx)));
-
-/*8 
-                new JoystickButton(operatorJoytick, 8).whileTrue(new Climb(climber));
-                new JoystickButton(operatorJoytick, 7).whileTrue(new Climbbutback(climber));
-
-                new JoystickButton(operatorJoytick, 1).whileTrue(new ElevatorAutoL2(elevator));
-               
-              // XboxController.Button.
-               // new JoystickButton(operatorJoytick, 7).whileTrue(new Launch(launcher)); */
-               
+          
         }
 
         /** Returns whichever autonomous routine is currently selected on SmartDashboard. */
