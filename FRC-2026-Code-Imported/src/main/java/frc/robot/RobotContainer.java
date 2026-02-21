@@ -19,6 +19,8 @@ import edu.wpi.first.cscore.VideoSource;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.SwerveJoystickCmd;
+import frc.robot.commands.LimelightAutoAim;
+import frc.robot.commands.LimelightTagFollow;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.commands.resetheading;
 import frc.robot.subsystems.Climber;
@@ -103,12 +105,12 @@ public class RobotContainer {
                 new JoystickButton(driverJoytick, 2).whileTrue(new resetheading(swerveSubsystem));
                 //new JoystickButton(operatorJoytick, 6).whileTrue(new Launch(launcher));
                 //new JoystickButton(operatorJoytick, 7).whileTrue(new Intake(launcher));
-                new JoystickButton(driverJoytick, 3).whileTrue(new SwerveJoystickCmd(
+                new JoystickButton(driverJoytick, 3).whileTrue(new LimelightAutoAim(
                                 swerveSubsystem,
                                 () -> -driverJoytick.getRawAxis(OIConstants.kDriverYAxis),
                                 () -> -driverJoytick.getRawAxis(OIConstants.kDriverXAxis),
-                                () -> LimelightHelpers.getTX("limelight") *-0.019,
                                 () -> !driverJoytick.getRawButton(OIConstants.kDriverFieldOrientedButtonIdx)));
+                new JoystickButton(driverJoytick, 4).whileTrue(new LimelightTagFollow(swerveSubsystem));
           
         }
 
