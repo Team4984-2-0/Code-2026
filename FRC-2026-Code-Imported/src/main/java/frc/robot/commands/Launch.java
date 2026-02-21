@@ -3,18 +3,20 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Launcher;
 
 public class Launch extends Command {
-        private Launcher Launchsub;
+        private Launcher LauncherSubsystem;
         
-        public Launch(Launcher Launchsub){
-            this.Launchsub = Launchsub;
-            addRequirements(Launchsub);
+        public Launch(Launcher LauncherSubsystem){
+            this.LauncherSubsystem = LauncherSubsystem;
+            addRequirements(LauncherSubsystem);
         }
         @Override
         public void execute(){
-            Launchsub.HopperRun(-0.20);
+            LauncherSubsystem.ShootRun(-0.20);
+            LauncherSubsystem.HopperRun(-0.20);
+            LauncherSubsystem.FeedRun(-0.20);
         }
         @Override
         public void end(boolean interrupted){
-            Launchsub.Killswitch();
+            LauncherSubsystem.Killswitch();
         }
 }
