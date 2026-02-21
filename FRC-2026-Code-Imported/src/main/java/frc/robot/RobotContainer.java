@@ -129,44 +129,43 @@ public class RobotContainer {
              //   new JoystickButton(operatorJoytick, 6).whileTrue(new Launch(launcher));
                // new JoystickButton(operatorJoytick, 7).whileTrue(new Intake(launcher));
                 new JoystickButton(driverJoytick, 3).whileTrue(new SwerveJoystickCmd(
-                        swerveSubsystem,
-                        () -> -driverJoytick.getRawAxis(OIConstants.kDriverYAxis),
-                        () -> -driverJoytick.getRawAxis(OIConstants.kDriverXAxis),
-                        () -> {
-                            // Read tx/tv directly from NetworkTables (limelight)
-                            var table = NetworkTableInstance.getDefault().getTable("limelight");
-                            double tx = -table.getEntry("tx").getDouble(0.0);
-                            double tv = table.getEntry("tv").getDouble(0.0);
+                                swerveSubsystem,
+                                () -> -driverJoytick.getRawAxis(OIConstants.kDriverYAxis),
+                                () -> -driverJoytick.getRawAxis(OIConstants.kDriverXAxis),
+                                () -> {
+                                    // Read tx/tv directly from NetworkTables (limelight)
+                                    var table = NetworkTableInstance.getDefault().getTable("limelight");
+                                    double tx = table.getEntry("tx").getDouble(0.0);
+                                    double tv = table.getEntry("tv").getDouble(0.0);
 
-                            // if no target, stop auto-rotation and reset smoothing state
-                            if (tv < 1.0) {
-                                rotRateLimiter.reset(0.0);
-                                limelightPID.reset();
-                                return 0.0;
-                            }
+                                    // if no target, stop auto-rotation and reset smoothing state
+                                    if (tv < 1.0) {
+                                        rotRateLimiter.reset(0.0);
+                                        limelightPID.reset();
+                                        return 0.0;
+                                    }
 
-                            // deadband to avoid jitter around center
-                            final double DEADBAND_DEG = 1.0;
-                            if (Math.abs(tx) <= DEADBAND_DEG) {
-                                rotRateLimiter.reset(0.0);
-                                limelightPID.reset();
-                                return 0.0;
-                            }
+                                    // deadband to avoid jitter around center
+                                    final double DEADBAND_DEG = 1.0;
+                                    if (Math.abs(tx) <= DEADBAND_DEG) {
+                                        rotRateLimiter.reset(0.0);
+                                        limelightPID.reset();
+                                        return 0.0;
+                                    }
 
-                            // PID drives tx -> 0.
-                            double pidOut = limelightPID.calculate(tx, 0.0); // NOTE: sign flipped here (was negated)
+                                    // PID drives tx -> 0. Invert sign if needed so positive tx rotates the correct direction.
+                                    double pidOut = -limelightPID.calculate(tx, 0.0);
 
-                            // clamp to smaller max to avoid aggressive corrections (reduces shaking)
-                            final double MAX_OUTPUT = 0.35;
-                            pidOut = Math.max(-MAX_OUTPUT, Math.min(MAX_OUTPUT, pidOut));
+                                    // clamp to smaller max to avoid aggressive corrections (reduces shaking)
+                                    final double MAX_OUTPUT = 0.35;
+                                    pidOut = Math.max(-MAX_OUTPUT, Math.min(MAX_OUTPUT, pidOut));
 
-                            // smooth sudden changes to avoid oscillation
-                            double limited = rotRateLimiter.calculate(pidOut);
+                                    // smooth sudden changes to avoid oscillation
+                                    double limited = rotRateLimiter.calculate(pidOut);
 
-                            // Invert final output so positive tx produces the correct rotation direction on this robot
-                            return -limited;
-                        },
-                        () -> !driverJoytick.getRawButton(OIConstants.kDriverFieldOrientedButtonIdx)));
+                                    return limited;
+                                },
+                                () -> !driverJoytick.getRawButton(OIConstants.kDriverFieldOrientedButtonIdx)));
 
 /*8 
                 new JoystickButton(operatorJoytick, 8).whileTrue(new Climb(climber));
