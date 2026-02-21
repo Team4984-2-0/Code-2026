@@ -11,10 +11,10 @@ public class Intake extends Command {
         }
         @Override
         public void execute(){
-            intakesub.Spin(0.20);
+            intakesub.HopperRun(0.20);
         }
         @Override
         public void end(boolean interrupted){
-            intakesub.Spin(0);
+            intakesub.Killswitch();
         }
 }

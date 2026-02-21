@@ -18,7 +18,7 @@ public class Climber extends SubsystemBase {
     public Climber() {
         SparkMaxConfig elevatorConfig = new SparkMaxConfig();
         elevatorConfig.idleMode(SparkBaseConfig.IdleMode.kBrake);
-        climbMotor = new SparkMax(13, MotorType.kBrushless);
+        climbMotor = new SparkMax(9, MotorType.kBrushless);
     
     }
 
