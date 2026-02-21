@@ -29,6 +29,7 @@ public class Launcher extends SubsystemBase {
         Hopper = new SparkMax(12, MotorType.kBrushless);
         Feed = new SparkMax(13, MotorType.kBrushless);
         Shoot = new SparkMax(14, MotorType.kBrushless);
+        // Device ids may need a change in number
 
         motor1Encoder = Hopper.getEncoder();
 
