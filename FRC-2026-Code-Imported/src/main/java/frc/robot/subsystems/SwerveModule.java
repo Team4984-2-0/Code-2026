@@ -1,5 +1,10 @@
 package frc.robot.subsystems;
 
+/**
+ * Represents a single swerve module (drive + steer). Provides helpers for
+ * encoder conversion, absolute angle syncing, and applying desired states.
+ */
+
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.*;
@@ -31,8 +36,17 @@ public class SwerveModule {
     private final boolean absoluteEncoderReversed;
     private final double absoluteEncoderOffsetRad;
 
+    /**
+     * @param driveMotorId CAN ID for the drive motor
+     * @param turningMotorId CAN ID for the steering motor
+     * @param driveMotorReversed whether the drive inversion should be flipped
+     * @param turningMotorReversed whether the steer inversion should be flipped
+     * @param absoluteEncoderId analog input channel wired to the absolute encoder
+     * @param absoluteEncoderOffset mechanical zero offset in radians
+     * @param absoluteEncoderReversed set true if encoder direction needs flipping
+     */
     public SwerveModule(int driveMotorId, int turningMotorId, boolean driveMotorReversed, boolean turningMotorReversed,
-            int absoluteEncoderId, double absoluteEncoderOffset, boolean absoluteEncoderReversed) {
+        int absoluteEncoderId, double absoluteEncoderOffset, boolean absoluteEncoderReversed) {
 
         this.absoluteEncoderOffsetRad = absoluteEncoderOffset;
         this.absoluteEncoderReversed = absoluteEncoderReversed;
@@ -69,25 +83,34 @@ public class SwerveModule {
      //   SmartDashboard.putNumber("encoder" + absoluteEncoder.getChannel() + " start", getAbsoluteEncoderRad());
         
     }
+    /** Sets which of the predefined power buckets the drive stage should use. */
     public void set_speed(int howfast) {
         power = howfast;
     }
+    /** @return drive encoder position in meters. */
     public double getDrivePosition() {
         return driveEncoder.getPosition();
     }
 
+    /** @return steering encoder position in radians. */
     public double getTurningPosition() {
         return turningEncoder.getPosition();
     }
 
+    /** @return drive encoder velocity in m/s. */
     public double getDriveVelocity() {
         return driveEncoder.getVelocity();
     }
 
+    /** @return turning encoder velocity in rad/s. */
     public double getTurningVelocity() {
         return turningEncoder.getVelocity();
     }
 
+    /**
+     * Converts the absolute encoder voltage to radians using the stored offset.
+     * Keeps the value normalized between +/- pi.
+     */
     public double getAbsoluteEncoderRad() {
         if (absoluteEncoder.getChannel() == 0) {
         //System.out.println("Swerve[" + absoluteEncoder.getChannel() + "] voltage " + absoluteEncoder.getVoltage());
@@ -106,6 +129,7 @@ public class SwerveModule {
         return angle;
     }
 
+    /** Syncs the relative encoders to the absolute reading. */
     public void resetEncoders() {
         driveEncoder.setPosition(0);
         //SmartDashboard.putNumber("encoder" + absoluteEncoder.getChannel() + " absolute before reset", getAbsoluteEncoderRad());
@@ -114,10 +138,15 @@ public class SwerveModule {
 
     }
 
+    /** @return current state (speed + angle) used by odometry. */
     public SwerveModuleState getState() {
         return new SwerveModuleState(getDriveVelocity(), new Rotation2d(getTurningPosition()));
     }
 
+    /**
+     * Applies a desired state from either teleop driving or an auto path.
+     * Optimizes the rotation to keep steering travel short.
+     */
     public void setDesiredState(SwerveModuleState state) {
         // This needs to be changed since it is depricated
         state = SwerveModuleState.optimize(state, getState().angle);
@@ -146,6 +175,7 @@ public class SwerveModule {
        // SmartDashboard.putNumber("encoder" + absoluteEncoder.getChannel() + " live", getAbsoluteEncoderRad());
     }
 
+    /** Stops both drive and steer motors immediately. */
     public void stop() {
         driveMotor.set(0);
         turningMotor.set(0);
