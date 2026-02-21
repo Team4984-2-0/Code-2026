@@ -1,8 +1,8 @@
 package frc.robot.subsystems;
 
-import frc.robot.commands.*;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.motorcontrol.Spark;
+/** Winch subsystem reserved for endgame climbing. */
+
+// Removed unused imports (commands.*, LiveWindow, Spark)
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.spark.*;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -15,6 +15,7 @@ public class Climber extends SubsystemBase {
     
      
 
+    /** Initializes the climb motor and idle mode. */
     public Climber() {
         SparkMaxConfig elevatorConfig = new SparkMaxConfig();
         elevatorConfig.idleMode(SparkBaseConfig.IdleMode.kBrake);
@@ -22,12 +23,14 @@ public class Climber extends SubsystemBase {
     
     }
 
+/** Spins the climb motor at the provided percent output. */
 public void Spin(double value) {
     climbMotor.set(value);
   
 }
 
 
+/** Stops the climb motor. */
 public void Spin() {
     climbMotor.set(0);
    

@@ -1,28 +1,16 @@
 package frc.robot.subsystems;
 
-import frc.robot.commands.*;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.motorcontrol.Spark;
+/** Dual motor elevator subsystem for raising game-piece mechanisms. */
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.*;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.*;
-import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.ModuleConstants;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.*;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import edu.wpi.first.math.controller.PIDController;
 
 public class Elevator extends SubsystemBase {
 
@@ -34,6 +22,7 @@ private final RelativeEncoder motor1Encoder;
     private SparkMax motor2;
     private final PIDController elevatorPidController;
 
+    /** Configures motors, encoders, and the PID stub for future closed-loop work. */
     public Elevator() {
 
 
@@ -50,16 +39,19 @@ private final RelativeEncoder motor1Encoder;
     }
     // Commenting out this for now, working on elevator auto move up / down. (2/12/25)
 
+/** Spins the elevator motors in opposite directions so the stage rises/lowers. */
 public void Rotate(double value) {
     SmartDashboard.putNumber("encoder elevator", get_encoderElev());
     motor1.set(value);
     motor2.set(-value);
 }
 
+/** Stops both elevator motors. */
 public void RotateStop() {
     motor1.set(0);
     motor2.set(0);
 }
+/** @return encoder position for diagnostics. */
 public double get_encoderElev(){
     return motor2Encoder.getPosition();
 }
