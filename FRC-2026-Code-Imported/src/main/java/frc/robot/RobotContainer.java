@@ -13,7 +13,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.VideoSource;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -67,8 +68,12 @@ public class RobotContainer {
         private final Elevator elevator = new Elevator();
 
         private final Launcher launcher = new Launcher();
-        
-        
+
+        // Limelight rotation controller + rate limiter to prevent oscillation
+        private final PIDController limelightPID = new PIDController(0.025, 0.0, 0.0015);
+        // Lower rate limit (units/sec) to help eliminate shaking. Tune this between 0.5 and 3.0.
+        private final SlewRateLimiter rotRateLimiter = new SlewRateLimiter(1.0);
+
         private final SendableChooser<Command> autoChooser;
 
         private final Joystick driverJoytick = new Joystick(OIConstants.kDriverControllerPort);
@@ -78,7 +83,8 @@ public class RobotContainer {
 
         public RobotContainer() {
           
-                
+                // smooth rotation tolerance
+                limelightPID.setTolerance(1.0); // degrees
 
                 autoChooser = AutoBuilder.buildAutoChooser();
 
@@ -123,11 +129,44 @@ public class RobotContainer {
              //   new JoystickButton(operatorJoytick, 6).whileTrue(new Launch(launcher));
                // new JoystickButton(operatorJoytick, 7).whileTrue(new Intake(launcher));
                 new JoystickButton(driverJoytick, 3).whileTrue(new SwerveJoystickCmd(
-                                swerveSubsystem,
-                                () -> -driverJoytick.getRawAxis(OIConstants.kDriverYAxis),
-                                () -> -driverJoytick.getRawAxis(OIConstants.kDriverXAxis),
-                                () -> LimelightHelpers.getTX("limelight") *-0.019,
-                                () -> !driverJoytick.getRawButton(OIConstants.kDriverFieldOrientedButtonIdx)));
+                        swerveSubsystem,
+                        () -> -driverJoytick.getRawAxis(OIConstants.kDriverYAxis),
+                        () -> -driverJoytick.getRawAxis(OIConstants.kDriverXAxis),
+                        () -> {
+                            // Read tx/tv directly from NetworkTables (limelight)
+                            var table = NetworkTableInstance.getDefault().getTable("limelight");
+                            double tx = -table.getEntry("tx").getDouble(0.0);
+                            double tv = table.getEntry("tv").getDouble(0.0);
+
+                            // if no target, stop auto-rotation and reset smoothing state
+                            if (tv < 1.0) {
+                                rotRateLimiter.reset(0.0);
+                                limelightPID.reset();
+                                return 0.0;
+                            }
+
+                            // deadband to avoid jitter around center
+                            final double DEADBAND_DEG = 1.0;
+                            if (Math.abs(tx) <= DEADBAND_DEG) {
+                                rotRateLimiter.reset(0.0);
+                                limelightPID.reset();
+                                return 0.0;
+                            }
+
+                            // PID drives tx -> 0.
+                            double pidOut = limelightPID.calculate(tx, 0.0); // NOTE: sign flipped here (was negated)
+
+                            // clamp to smaller max to avoid aggressive corrections (reduces shaking)
+                            final double MAX_OUTPUT = 0.35;
+                            pidOut = Math.max(-MAX_OUTPUT, Math.min(MAX_OUTPUT, pidOut));
+
+                            // smooth sudden changes to avoid oscillation
+                            double limited = rotRateLimiter.calculate(pidOut);
+
+                            // Invert final output so positive tx produces the correct rotation direction on this robot
+                            return -limited;
+                        },
+                        () -> !driverJoytick.getRawButton(OIConstants.kDriverFieldOrientedButtonIdx)));
 
 /*8 
                 new JoystickButton(operatorJoytick, 8).whileTrue(new Climb(climber));
