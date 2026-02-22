@@ -37,16 +37,17 @@ public class SwerveModule {
     private final double absoluteEncoderOffsetRad;
 
     /**
-     * @param driveMotorId CAN ID for the drive motor
-     * @param turningMotorId CAN ID for the steering motor
-     * @param driveMotorReversed whether the drive inversion should be flipped
-     * @param turningMotorReversed whether the steer inversion should be flipped
-     * @param absoluteEncoderId analog input channel wired to the absolute encoder
-     * @param absoluteEncoderOffset mechanical zero offset in radians
+     * @param driveMotorId            CAN ID for the drive motor
+     * @param turningMotorId          CAN ID for the steering motor
+     * @param driveMotorReversed      whether the drive inversion should be flipped
+     * @param turningMotorReversed    whether the steer inversion should be flipped
+     * @param absoluteEncoderId       analog input channel wired to the absolute
+     *                                encoder
+     * @param absoluteEncoderOffset   mechanical zero offset in radians
      * @param absoluteEncoderReversed set true if encoder direction needs flipping
      */
     public SwerveModule(int driveMotorId, int turningMotorId, boolean driveMotorReversed, boolean turningMotorReversed,
-        int absoluteEncoderId, double absoluteEncoderOffset, boolean absoluteEncoderReversed) {
+            int absoluteEncoderId, double absoluteEncoderOffset, boolean absoluteEncoderReversed) {
 
         this.absoluteEncoderOffsetRad = absoluteEncoderOffset;
         this.absoluteEncoderReversed = absoluteEncoderReversed;
@@ -67,26 +68,32 @@ public class SwerveModule {
         driveConfig.encoder.velocityConversionFactor(ModuleConstants.kDriveEncoderRPM2MeterPerSec);
         driveConfig.inverted(driveMotorReversed);
 
-        driveMotor.configure(driveConfig, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
+        driveMotor.configure(driveConfig, SparkBase.ResetMode.kResetSafeParameters,
+                SparkBase.PersistMode.kPersistParameters);
 
         turnConfig.idleMode(SparkBaseConfig.IdleMode.kBrake);
         turnConfig.encoder.positionConversionFactor(ModuleConstants.kTurningEncoderRot2Rad);
         turnConfig.encoder.velocityConversionFactor(ModuleConstants.kTurningEncoderRPM2RadPerSec);
         turnConfig.inverted(turningMotorReversed);
 
-        turningMotor.configure(turnConfig, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
+        turningMotor.configure(turnConfig, SparkBase.ResetMode.kResetSafeParameters,
+                SparkBase.PersistMode.kPersistParameters);
 
         turningPidController = new PIDController(ModuleConstants.kPTurning, 0, 0);
         turningPidController.enableContinuousInput(-Math.PI, Math.PI);
-        //SmartDashboard.putNumber("encoder" + absoluteEncoder.getChannel(), getAbsoluteEncoderRad());
+        // SmartDashboard.putNumber("encoder" + absoluteEncoder.getChannel(),
+        // getAbsoluteEncoderRad());
         resetEncoders();
-     //   SmartDashboard.putNumber("encoder" + absoluteEncoder.getChannel() + " start", getAbsoluteEncoderRad());
-        
+        // SmartDashboard.putNumber("encoder" + absoluteEncoder.getChannel() + " start",
+        // getAbsoluteEncoderRad());
+
     }
+
     /** Sets which of the predefined power buckets the drive stage should use. */
     public void set_speed(int howfast) {
         power = howfast;
     }
+
     /** @return drive encoder position in meters. */
     public double getDrivePosition() {
         return driveEncoder.getPosition();
@@ -113,11 +120,13 @@ public class SwerveModule {
      */
     public double getAbsoluteEncoderRad() {
         if (absoluteEncoder.getChannel() == 0) {
-        //System.out.println("Swerve[" + absoluteEncoder.getChannel() + "] voltage " + absoluteEncoder.getVoltage());
-        //System.out.println("Swerve[" + absoluteEncoder.getChannel() + "] rio5v " + RobotController.getVoltage5V());
+            // System.out.println("Swerve[" + absoluteEncoder.getChannel() + "] voltage " +
+            // absoluteEncoder.getVoltage());
+            // System.out.println("Swerve[" + absoluteEncoder.getChannel() + "] rio5v " +
+            // RobotController.getVoltage5V());
         }
         double angle = absoluteEncoder.getVoltage() / (RobotController.getVoltage5V());
-        
+
         angle *= 2 * Math.PI;
         angle -= absoluteEncoderOffsetRad;
         return angle * (absoluteEncoderReversed ? -1.0 : 1.0);
@@ -132,9 +141,11 @@ public class SwerveModule {
     /** Syncs the relative encoders to the absolute reading. */
     public void resetEncoders() {
         driveEncoder.setPosition(0);
-        //SmartDashboard.putNumber("encoder" + absoluteEncoder.getChannel() + " absolute before reset", getAbsoluteEncoderRad());
+        // SmartDashboard.putNumber("encoder" + absoluteEncoder.getChannel() + "
+        // absolute before reset", getAbsoluteEncoderRad());
         turningEncoder.setPosition(getAbsoluteEncoderRad());
-        //SmartDashboard.putNumber("encoder" + absoluteEncoder.getChannel() + " turning encoder", turningEncoder.getPosition());
+        // SmartDashboard.putNumber("encoder" + absoluteEncoder.getChannel() + " turning
+        // encoder", turningEncoder.getPosition());
 
     }
 
@@ -152,27 +163,33 @@ public class SwerveModule {
         state = SwerveModuleState.optimize(state, getState().angle);
         switch (power) {
             case 1:
-                driveMotor.set((state.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeedMetersPerSecond)/1.3);
+                driveMotor.set((state.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeedMetersPerSecond) / 1.3);
                 break;
             case 2:
-                driveMotor.set((state.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeedMetersPerSecond)/2);
+                driveMotor.set((state.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeedMetersPerSecond) / 2);
                 break;
-            case 3: 
+            case 3:
                 driveMotor.set((state.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeedMetersPerSecond));
                 break;
             default:
-                driveMotor.set((state.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeedMetersPerSecond)/2);
+                driveMotor.set((state.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeedMetersPerSecond) / 2);
                 break;
         }
-/*         if (speed) {
-            driveMotor.set((state.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeedMetersPerSecond)/1.3);
-        }
-        else {
-            driveMotor.set((state.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeedMetersPerSecond)/2);
-        } */
+        /*
+         * if (speed) {
+         * driveMotor.set((state.speedMetersPerSecond /
+         * DriveConstants.kPhysicalMaxSpeedMetersPerSecond)/1.3);
+         * }
+         * else {
+         * driveMotor.set((state.speedMetersPerSecond /
+         * DriveConstants.kPhysicalMaxSpeedMetersPerSecond)/2);
+         * }
+         */
         turningMotor.set(turningPidController.calculate(getTurningPosition(), state.angle.getRadians()));
-      //  SmartDashboard.putString("Swerve[" + absoluteEncoder.getChannel() + "] state", state.toString());
-       // SmartDashboard.putNumber("encoder" + absoluteEncoder.getChannel() + " live", getAbsoluteEncoderRad());
+        // SmartDashboard.putString("Swerve[" + absoluteEncoder.getChannel() + "]
+        // state", state.toString());
+        // SmartDashboard.putNumber("encoder" + absoluteEncoder.getChannel() + " live",
+        // getAbsoluteEncoderRad());
     }
 
     /** Stops both drive and steer motors immediately. */

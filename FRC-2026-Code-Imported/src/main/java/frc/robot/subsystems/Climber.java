@@ -12,30 +12,25 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 public class Climber extends SubsystemBase {
 
     private SparkMax climbMotor;
-    
-     
 
     /** Initializes the climb motor and idle mode. */
     public Climber() {
         SparkMaxConfig elevatorConfig = new SparkMaxConfig();
         elevatorConfig.idleMode(SparkBaseConfig.IdleMode.kBrake);
         climbMotor = new SparkMax(9, MotorType.kBrushless);
-    
+
     }
 
-/** Spins the climb motor at the provided percent output. */
-public void Spin(double value) {
-    climbMotor.set(value);
-  
-}
+    /** Spins the climb motor at the provided percent output. */
+    public void Spin(double value) {
+        climbMotor.set(value);
 
+    }
 
-/** Stops the climb motor. */
-public void Spin() {
-    climbMotor.set(0);
-   
-   
-}
+    /** Stops the climb motor. */
+    public void Spin() {
+        climbMotor.set(0);
 
+    }
 
 }
