@@ -1,0 +1,28 @@
+name: Gradle Build
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x FRC-2026-Code-Imported/gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew build
+        working-directory: FRC-2026-Code-Imported
