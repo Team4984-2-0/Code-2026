@@ -13,12 +13,12 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class Launcher extends SubsystemBase {
 
-        private final RelativeEncoder FeedEncoder;
-        private final RelativeEncoder HopperEncoder;
-        private final RelativeEncoder ShootEncoder;
-        private SparkMax Hopper; 
-        private SparkMax Feed;
-        private SparkMax Shoot;
+    private final RelativeEncoder FeedEncoder;
+    private final RelativeEncoder HopperEncoder;
+    private final RelativeEncoder ShootEncoder;
+    private SparkMax Hopper;
+    private SparkMax Feed;
+    private SparkMax Shoot;
 
     /** Sets up the shooter motor, encoder, and PID placeholder. */
     public Launcher() {
@@ -32,34 +32,41 @@ public class Launcher extends SubsystemBase {
 
         SparkMaxConfig elevatorConfig = new SparkMaxConfig();
         elevatorConfig.idleMode(SparkBaseConfig.IdleMode.kBrake);
-       
+
     }
 
     public void Killswitch() {
         Feed.set(0);
         Hopper.set(0);
         Shoot.set(0);
-    
+
     }
-    public double get_encoder(){
+
+    public double get_encoder() {
         return FeedEncoder.getPosition();
     }
+
     public void HopperRun(double value) {
         Hopper.set(-value);
 
     }
-    public void FeedRun(double value){
+
+    public void FeedRun(double value) {
         Feed.set(-value);
     }
+
     public void ShootRun(double value) {
         Shoot.set(-value);
     }
+
     public void HopperStop() {
         Hopper.set(0);
     }
+
     public void FeedStop() {
         Feed.set(0);
     }
+
     public void ShootStop() {
         Feed.set(0);
     }
