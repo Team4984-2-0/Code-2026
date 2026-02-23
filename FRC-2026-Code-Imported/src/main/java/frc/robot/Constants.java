@@ -128,6 +128,36 @@ public class Constants {
 
         public static final double kDeadband = 0.1;
     }
+
+    public static final class VisionConstants {
+        /** NetworkTables name configured on the primary Limelight. */
+        public static final String kPrimaryLimelightName = "limelight";
+        /** PID controller gains for auto-aim (units are radians). */
+        public static final double kAimKp = 5.5;
+        public static final double kAimKi = 0.0;
+        public static final double kAimKd = 0.2;
+        /** Integral clamp (degrees) so windup only happens near the target. */
+        public static final double kAimIntegralZoneDegrees = 8.0;
+        /** Degrees of horizontal error we consider "close enough" to avoid oscillation. */
+        public static final double kAimDeadbandDegrees = 0.4;
+        /** Absolute angular speed limit for the PID output. */
+        public static final double kAimMaxAngularSpeedRadPerSec = Math.PI; // ~180 deg/s
+
+        /** Desired standoff distance from the tag along the camera X axis (meters). */
+        public static final double kTagFollowGoalXMeters = 1.0;
+        /** Desired lateral offset relative to the tag; keep centered by staying at 0 m. */
+        public static final double kTagFollowGoalYMeters = 0.0;
+        /** Proportional gain for forward motion toward the tag. */
+        public static final double kTagFollowXP = 1.6;
+        /** Proportional gain for lateral correction toward the tag. */
+        public static final double kTagFollowYP = 2.0;
+        /** Maximum linear velocity commanded by the tag-follow controller. */
+        public static final double kTagFollowMaxLinearSpeedMetersPerSecond = 2.0;
+        /** Max rate-of-change for the linear commands to keep motion smooth. */
+        public static final double kTagFollowMaxLinearAccelerationMetersPerSecondSquared = 3.0;
+        /** Distance error threshold (m) considered good enough for both X and Y axes. */
+        public static final double kTagFollowTranslationalToleranceMeters = 0.05;
+    }
     
     public static final class UnitConversions {
         public static final double feetToMeters = 3.28084;
