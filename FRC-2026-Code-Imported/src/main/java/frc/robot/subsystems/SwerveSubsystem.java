@@ -10,11 +10,11 @@ import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -67,25 +67,14 @@ public class SwerveSubsystem extends SubsystemBase {
   private final SwerveModule[] modules = { frontLeft, frontRight, backLeft, backRight };
 
   /** Field visualization published to Shuffleboard. */
-  private Field2d myfield;
-  private SwerveModulePosition frontleftpos = new SwerveModulePosition(frontLeft.getDrivePosition(),
-      frontLeft.getState().angle);
-  private SwerveModulePosition frontrightpos = new SwerveModulePosition(frontRight.getDrivePosition(),
-      frontRight.getState().angle);
-  private SwerveModulePosition backLeftpos = new SwerveModulePosition(backLeft.getDrivePosition(),
-      backLeft.getState().angle);
-  private SwerveModulePosition backRightpos = new SwerveModulePosition(backRight.getDrivePosition(),
-      backRight.getState().angle);
-
-  private SwerveModulePosition[] WheelPositions = { frontleftpos, frontrightpos, backLeftpos, backRightpos };
+  private final Field2d myfield = new Field2d();
 
   double xLocationStartFeet = 11.495; // down field long
   double yLocationStartFeet = 3.897; // side to side
   Rotation2d angleStartDegrees = Rotation2d.fromDegrees(0.0);
   Pose2d startingPosition = new Pose2d(xLocationStartFeet, yLocationStartFeet, angleStartDegrees);
-  private final SwerveDriveOdometry odometer = new SwerveDriveOdometry(DriveConstants.kDriveKinematics,
-      new Rotation2d(0), WheelPositions, startingPosition);
-  private SwerveDriveKinematics kinematics = DriveConstants.kDriveKinematics;
+  private final SwerveDriveKinematics kinematics = DriveConstants.kDriveKinematics;
+  private final SwerveDrivePoseEstimator poseEstimator;
   RobotConfig configs;
 
   /** Configures modules, odometry, and auto builder hooks. */
@@ -144,7 +133,11 @@ public class SwerveSubsystem extends SubsystemBase {
     backRight.resetEncoders();
     frontLeft.resetEncoders();
     frontRight.resetEncoders();
-    myfield = new Field2d();
+  poseEstimator = new SwerveDrivePoseEstimator(
+    DriveConstants.kDriveKinematics,
+    getRotation2d(),
+    getPositions(),
+    startingPosition);
   }
 
   public void maxspeed(int speed) {
@@ -160,7 +153,12 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   public void resetPose(Pose2d pose) {
     System.out.println(pose);
-    odometer.resetPosition(gyro.getRotation2d(), getPositions(), pose);
+    poseEstimator.resetPosition(getRotation2d(), getPositions(), pose);
+  }
+
+  /** Injects a trusted vision pose (e.g., Limelight AprilTag solution). */
+  public void addVisionMeasurement(Pose2d pose, double timestampSeconds) {
+    poseEstimator.addVisionMeasurement(pose, timestampSeconds);
   }
 
   /** Returns current chassis speeds derived from module states. */
@@ -178,13 +176,12 @@ public class SwerveSubsystem extends SubsystemBase {
 
     SwerveModuleState[] targetStates = kinematics.toSwerveModuleStates(targetSpeeds);
     // setStates(targetStates);
-    myfield.setRobotPose(odometer.getPoseMeters());
     setModuleStates(targetStates);
   }
 
   /** Convenience wrapper that also updates the field widget. */
   public void setStates(SwerveModuleState[] targetStates) {
-    myfield.setRobotPose(odometer.getPoseMeters());
+    myfield.setRobotPose(poseEstimator.getEstimatedPosition());
     SwerveDriveKinematics.desaturateWheelSpeeds(targetStates, DriveConstants.kPhysicalMaxSpeedMetersPerSecond);
 
     for (int i = 0; i < modules.length; i++) {
@@ -201,7 +198,11 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   public SwerveModulePosition[] getPositions() {
-    return WheelPositions;
+    return new SwerveModulePosition[] {
+        frontLeft.getPosition(),
+        frontRight.getPosition(),
+        backLeft.getPosition(),
+        backRight.getPosition() };
   }
 
   /** Zeroes the NavX yaw reading (used when drivers press reset heading). */
@@ -220,30 +221,18 @@ public class SwerveSubsystem extends SubsystemBase {
 
   /** Latest fused pose from WPILib odometry. */
   public Pose2d getPose() {
-    return odometer.getPoseMeters();
+    return poseEstimator.getEstimatedPosition();
   }
 
   public void resetpose(Pose2d pose) {
-    odometer.resetPosition(getRotation2d(), WheelPositions, pose);
+    poseEstimator.resetPosition(getRotation2d(), getPositions(), pose);
   }
 
   @Override
   public void periodic() {
-    WheelPositions[0].angle = frontLeft.getState().angle;
-    WheelPositions[0].distanceMeters = frontLeft.getDrivePosition();
-
-    WheelPositions[1].angle = frontRight.getState().angle;
-    WheelPositions[1].distanceMeters = frontRight.getDrivePosition();
-
-    WheelPositions[2].angle = backLeft.getState().angle;
-    WheelPositions[2].distanceMeters = backLeft.getDrivePosition();
-
-    WheelPositions[3].angle = backRight.getState().angle;
-    WheelPositions[3].distanceMeters = backRight.getDrivePosition();
-
-    odometer.update(getRotation2d(), WheelPositions);
+    poseEstimator.update(getRotation2d(), getPositions());
     SmartDashboard.putData("Field", myfield);
-    myfield.setRobotPose(odometer.getPoseMeters());
+    myfield.setRobotPose(poseEstimator.getEstimatedPosition());
     SmartDashboard.putNumber("Robot Heading", getHeading());
     SmartDashboard.putString("Robot Location", getPose().getTranslation().toString());
     SmartDashboard.putNumber("odometer X", getPose().getX());

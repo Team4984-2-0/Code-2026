@@ -6,15 +6,18 @@ package frc.robot.subsystems;
  */
 
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.*;
+import com.revrobotics.spark.SparkBase;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.*;
-import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.RobotController;
+import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ModuleConstants;
@@ -29,7 +32,6 @@ public class SwerveModule {
 
     private final PIDController turningPidController;
     private int power;
-    private boolean speed;
 
     // what does this look like
     private final AnalogInput absoluteEncoder;
@@ -51,8 +53,7 @@ public class SwerveModule {
 
         this.absoluteEncoderOffsetRad = absoluteEncoderOffset;
         this.absoluteEncoderReversed = absoluteEncoderReversed;
-        absoluteEncoder = new AnalogInput(absoluteEncoderId);
-        speed = true;
+    absoluteEncoder = new AnalogInput(absoluteEncoderId);
         power = 3;
         driveMotor = new SparkMax(driveMotorId, MotorType.kBrushless);
         turningMotor = new SparkMax(turningMotorId, MotorType.kBrushless);
@@ -141,12 +142,11 @@ public class SwerveModule {
     /** Syncs the relative encoders to the absolute reading. */
     public void resetEncoders() {
         driveEncoder.setPosition(0);
-        // SmartDashboard.putNumber("encoder" + absoluteEncoder.getChannel() + "
-        // absolute before reset", getAbsoluteEncoderRad());
-        turningEncoder.setPosition(getAbsoluteEncoderRad());
-        // SmartDashboard.putNumber("encoder" + absoluteEncoder.getChannel() + " turning
-        // encoder", turningEncoder.getPosition());
-
+        double absoluteAngle = MathUtil.angleModulus(getAbsoluteEncoderRad());
+        if (!Double.isFinite(absoluteAngle)) {
+            absoluteAngle = 0.0;
+        }
+        turningEncoder.setPosition(absoluteAngle);
     }
 
     /** @return current state (speed + angle) used by odometry. */
@@ -154,25 +154,29 @@ public class SwerveModule {
         return new SwerveModuleState(getDriveVelocity(), new Rotation2d(getTurningPosition()));
     }
 
+    /** @return latest pose snapshot for odometry/pose estimation. */
+    public SwerveModulePosition getPosition() {
+        return new SwerveModulePosition(getDrivePosition(), new Rotation2d(getTurningPosition()));
+    }
+
     /**
      * Applies a desired state from either teleop driving or an auto path.
      * Optimizes the rotation to keep steering travel short.
      */
     public void setDesiredState(SwerveModuleState state) {
-        // This needs to be changed since it is depricated
-        state = SwerveModuleState.optimize(state, getState().angle);
+        SwerveModuleState optimizedState = optimizeState(state);
         switch (power) {
             case 1:
-                driveMotor.set((state.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeedMetersPerSecond) / 1.3);
+                driveMotor.set((optimizedState.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeedMetersPerSecond) / 1.3);
                 break;
             case 2:
-                driveMotor.set((state.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeedMetersPerSecond) / 2);
+                driveMotor.set((optimizedState.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeedMetersPerSecond) / 2);
                 break;
             case 3:
-                driveMotor.set((state.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeedMetersPerSecond));
+                driveMotor.set((optimizedState.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeedMetersPerSecond));
                 break;
             default:
-                driveMotor.set((state.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeedMetersPerSecond) / 2);
+                driveMotor.set((optimizedState.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeedMetersPerSecond) / 2);
                 break;
         }
         /*
@@ -185,11 +189,27 @@ public class SwerveModule {
          * DriveConstants.kPhysicalMaxSpeedMetersPerSecond)/2);
          * }
          */
-        turningMotor.set(turningPidController.calculate(getTurningPosition(), state.angle.getRadians()));
+        turningMotor.set(turningPidController.calculate(getTurningPosition(), optimizedState.angle.getRadians()));
         // SmartDashboard.putString("Swerve[" + absoluteEncoder.getChannel() + "]
         // state", state.toString());
         // SmartDashboard.putNumber("encoder" + absoluteEncoder.getChannel() + " live",
         // getAbsoluteEncoderRad());
+    }
+
+    private SwerveModuleState optimizeState(SwerveModuleState desiredState) {
+        double currentAngle = getTurningPosition();
+        double targetAngle = MathUtil.angleModulus(desiredState.angle.getRadians());
+        double delta = MathUtil.inputModulus(targetAngle - currentAngle, -Math.PI, Math.PI);
+
+        double optimizedAngle = currentAngle + delta;
+        double optimizedSpeed = desiredState.speedMetersPerSecond;
+
+        if (Math.abs(delta) > Math.PI / 2.0) {
+            optimizedSpeed *= -1.0;
+            optimizedAngle = MathUtil.angleModulus(optimizedAngle + Math.PI);
+        }
+
+        return new SwerveModuleState(optimizedSpeed, new Rotation2d(optimizedAngle));
     }
 
     /** Stops both drive and steer motors immediately. */
