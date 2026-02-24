@@ -13,13 +13,7 @@
         {
           "type": "named",
           "data": {
-            "name": "LimelightAuto"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 5.0
+            "name": "swapPipeline"
           }
         },
         {
