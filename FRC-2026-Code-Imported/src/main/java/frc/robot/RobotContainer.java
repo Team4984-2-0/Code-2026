@@ -53,6 +53,7 @@ public class RobotContainer {
         private final XboxController operatorJoytick = new XboxController(OIConstants.kOperatorControllerPort);
         
         SendableChooser<Command> m_Chooser = new SendableChooser<>();
+        public double batteryVoltage = 0.0;
 
   /**
    * Builds the container, default command bindings, and starts the auxiliary
@@ -65,6 +66,7 @@ public class RobotContainer {
                 autoChooser = AutoBuilder.buildAutoChooser();
 
                 SmartDashboard.putData("Auto Chooser", autoChooser);
+                SmartDashboard.putNumber( "Battery Voltage", batteryVoltage);
 
                 //m_Chooser.setDefaultOption("Auto Command", getAutonomousCommand());
                 SmartDashboard.putData("Auto Mode",m_Chooser);
