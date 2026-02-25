@@ -37,7 +37,7 @@ public class Intake extends SubsystemBase {
         motor1 = new SparkMax(11, MotorType.kBrushless);
         motor2Encoder = motor1.getEncoder();
 
-        motor2 = new SparkMax(11, MotorType.kBrushless);
+        motor2 = new SparkMax(12, MotorType.kBrushless);
         motor3Encoder = motor2.getEncoder();
 
         SparkMaxConfig elevatorConfig = new SparkMaxConfig();
