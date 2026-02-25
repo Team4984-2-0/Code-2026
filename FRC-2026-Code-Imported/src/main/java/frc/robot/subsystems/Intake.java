@@ -15,6 +15,8 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class Intake extends SubsystemBase {
 
+    // SparkMax numbers subject to change
+
     // SparkMax 10
     private SparkMax motor;
     private final RelativeEncoder motor1Encoder;
@@ -23,12 +25,20 @@ public class Intake extends SubsystemBase {
     private SparkMax motor1;
     private final RelativeEncoder motor2Encoder;
 
+    // SparkMax 12
+    private SparkMax motor2;
+    private final RelativeEncoder motor3Encoder;
+
     public Intake() {
+
         motor = new SparkMax(10, MotorType.kBrushless);
         motor1Encoder = motor.getEncoder();
 
         motor1 = new SparkMax(11, MotorType.kBrushless);
         motor2Encoder = motor1.getEncoder();
+
+        motor2 = new SparkMax(11, MotorType.kBrushless);
+        motor3Encoder = motor2.getEncoder();
 
         SparkMaxConfig elevatorConfig = new SparkMaxConfig();
         elevatorConfig.idleMode(SparkBaseConfig.IdleMode.kBrake);
@@ -42,6 +52,7 @@ public class Intake extends SubsystemBase {
     // spins motor (IntakeDrop)
     public void IntakeDrop() {
         motor1.set(0.5);
+        motor2.set(-0.5);
     }
 
     // stops motor (Spin)
