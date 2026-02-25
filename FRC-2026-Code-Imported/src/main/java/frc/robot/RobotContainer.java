@@ -19,6 +19,10 @@ import frc.robot.commands.LimelightAutoAim;
 import frc.robot.commands.LimelightTagFollow;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.commands.resetheading;
+import frc.robot.commands.SetLimelightPipeline0;
+import frc.robot.commands.SetLimelightPipeline1;
+import frc.robot.commands.SetLimelightPipeline2;
+import frc.robot.commands.SetLimelightPipeline3;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Launcher;
 
@@ -79,6 +83,11 @@ public class RobotContainer {
    * when changing control schemes.
    */
   private void configureButtonBindings() {
+
+      new JoystickButton(operatorJoytick, 1).onTrue(new SetLimelightPipeline0());
+      new JoystickButton(operatorJoytick, 2).onTrue(new SetLimelightPipeline1());
+      new JoystickButton(operatorJoytick, 3).onTrue(new SetLimelightPipeline2());
+      new JoystickButton(operatorJoytick, 4).onTrue(new SetLimelightPipeline3());
     new JoystickButton(driverJoytick, 2).whileTrue(new resetheading(swerveSubsystem));
     // new JoystickButton(operatorJoytick, 6).whileTrue(new Launch(launcher));
     // new JoystickButton(operatorJoytick, 7).whileTrue(new Intake(launcher));
