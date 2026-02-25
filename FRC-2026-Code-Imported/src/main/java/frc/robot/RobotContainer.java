@@ -78,31 +78,39 @@ public class RobotContainer {
 
   }
 
-  /**
-   * Houses all button bindings so drivers have a single location to reference
-   * when changing control schemes.
-   */
   private void configureButtonBindings() {
 
-      new JoystickButton(operatorJoytick, 1).onTrue(new SetLimelightPipeline0());
-      new JoystickButton(operatorJoytick, 2).onTrue(new SetLimelightPipeline1());
-      new JoystickButton(operatorJoytick, 3).onTrue(new SetLimelightPipeline2());
-      new JoystickButton(operatorJoytick, 4).onTrue(new SetLimelightPipeline3());
-    new JoystickButton(driverJoytick, 2).whileTrue(new resetheading(swerveSubsystem));
-    // new JoystickButton(operatorJoytick, 6).whileTrue(new Launch(launcher));
-    // new JoystickButton(operatorJoytick, 7).whileTrue(new Intake(launcher));
-    new JoystickButton(driverJoytick, 3).whileTrue(new LimelightAutoAim(
+    //////////////////////////////// Driver Controller ////////////////////////////////
+
+    // Reset Heading
+       new JoystickButton(driverJoytick, 2).whileTrue(new resetheading(swerveSubsystem));
+
+   // Automatically Aiming with Limelight
+       new JoystickButton(driverJoytick, 3).whileTrue(new LimelightAutoAim(
         swerveSubsystem,
         () -> -driverJoytick.getRawAxis(OIConstants.kDriverYAxis),
         () -> -driverJoytick.getRawAxis(OIConstants.kDriverXAxis),
         () -> !driverJoytick.getRawButton(OIConstants.kDriverFieldOrientedButtonIdx)));
-    new JoystickButton(driverJoytick, 4).whileTrue(new LimelightTagFollow(swerveSubsystem));
+    
+    // Automatically Driving with Limelight
+        new JoystickButton(driverJoytick, 4).whileTrue(new LimelightTagFollow(swerveSubsystem));
+
+
+
+
+    //////////////////////////////// Operator Controller ////////////////////////////////
+
+    // Swapping Diffrent LimeLight PipeLines
+        new JoystickButton(operatorJoytick, 1).onTrue(new SetLimelightPipeline0());
+        new JoystickButton(operatorJoytick, 2).onTrue(new SetLimelightPipeline1());
+        new JoystickButton(operatorJoytick, 3).onTrue(new SetLimelightPipeline2());
+       new JoystickButton(operatorJoytick, 4).onTrue(new SetLimelightPipeline3());
+ 
+    // new JoystickButton(operatorJoytick, 6).whileTrue(new Launch(launcher));
+    // new JoystickButton(operatorJoytick, 7).whileTrue(new Intake(launcher));
+    
 
   }
-
-  /**
-   * Returns whichever autonomous routine is currently selected on SmartDashboard.
-   */
   public Command getAutonomousCommand() {
     // This method loads the auto when it is called, however, it is recommended
     // to first load your paths/autos when code starts, then return the
