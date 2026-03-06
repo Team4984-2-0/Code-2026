@@ -13,8 +13,12 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.SwerveJoystickCmd;
+import frc.robot.commands.Climb;
+import frc.robot.commands.ClimbDown;
 import frc.robot.commands.LimelightAutoAim;
 import frc.robot.commands.LimelightTagFollow;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -27,6 +31,8 @@ import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Launcher;
 
 import frc.robot.subsystems.Intake;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class RobotContainer {
 
@@ -73,15 +79,34 @@ public class RobotContainer {
         () -> !driverJoytick.getRawButton(OIConstants.kDriverFieldOrientedButtonIdx)));
     // launcher.setDefaultCommand(new Shooter(launcher));
     configureButtonBindings();
+
+    // Publish simple boolean for Shuffleboard (true = tag seen)
+    Timer limelightTimer = new Timer(true);
+    limelightTimer.scheduleAtFixedRate(new TimerTask() {
+      @Override
+      public void run() {
+        var table = NetworkTableInstance.getDefault().getTable("limelight");
+        double tv = table.getEntry("tv").getDouble(0.0);   // 1 = target visible
+        double tid = table.getEntry("tid").getDouble(-1); // tag id if present
+        boolean hasTag = (tv >= 1.0) || (tid >= 0.0);
+        SmartDashboard.putBoolean("Limelight/HasTag", hasTag);
+      }
+    }, 0, 200);
+
     // Ported Camera Code
     // SmartDashboard.putData("Auto Mode",m_Chooser);
 
   }
 
+  // Helper to get current AprilTag ID from Limelight
+  private double getTid() {
+    return NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDouble(-1);
+  }
+
   private void configureButtonBindings() {
 
     //////////////////////////////// Driver Controller ////////////////////////////////
-
+    /// 
     // Reset Heading
        new JoystickButton(driverJoytick, 2).whileTrue(new resetheading(swerveSubsystem));
 
@@ -100,11 +125,22 @@ public class RobotContainer {
 
     //////////////////////////////// Operator Controller ////////////////////////////////
 
+    // Climber
+       new JoystickButton(operatorJoytick, 2).whileTrue(new Climb(climber));
+       new JoystickButton(operatorJoytick, 1).whileTrue(new ClimbDown(climber));
+
+    // Line Up with Climber: only if AprilTag 16 is visible
+       Trigger tag16Visible = new Trigger(() -> getTid() == 16);
+       tag16Visible.and(new JoystickButton(operatorJoytick, 3)).whileTrue(new LimelightAutoAim(
+        swerveSubsystem,
+        () -> -operatorJoytick.getRawAxis(OIConstants.kDriverYAxis),
+        () -> -operatorJoytick.getRawAxis(OIConstants.kDriverXAxis),
+        () -> !operatorJoytick.getRawButton(OIConstants.kDriverFieldOrientedButtonIdx)));
+       tag16Visible.and(new JoystickButton(operatorJoytick, 3)).whileTrue(new LimelightTagFollow(swerveSubsystem));
+
+
     // Swapping Diffrent LimeLight PipeLines
-        new JoystickButton(operatorJoytick, 1).onTrue(new SetLimelightPipeline0());
-        new JoystickButton(operatorJoytick, 2).onTrue(new SetLimelightPipeline1());
-        new JoystickButton(operatorJoytick, 3).onTrue(new SetLimelightPipeline2());
-       new JoystickButton(operatorJoytick, 4).onTrue(new SetLimelightPipeline3());
+       // new JoystickButton(operatorJoytick, 1).whileTrue(new Climb(climber));
  
     // new JoystickButton(operatorJoytick, 6).whileTrue(new Launch(launcher));
     // new JoystickButton(operatorJoytick, 7).whileTrue(new Intake(launcher));
