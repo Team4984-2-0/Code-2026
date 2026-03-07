@@ -132,6 +132,29 @@ public class Constants {
     public static final class UnitConversions {
         public static final double feetToMeters = 3.28084;
     }
+
+    public static final class ClimbConstants {
+        /** Limelight pipeline index configured for the climb AprilTag target. */
+        public static final int kClimbPipeline = 0;
+
+        /** Proportional gain converting Limelight TX (degrees) to rotation speed (rad/s). */
+        public static final double kAlignKp = 0.05;
+
+        /** TX tolerance in degrees; the horizontal axis must be within this before the climber engages. */
+        public static final double kAlignTolerance = 2.0;
+
+        /** Target-area percentage threshold indicating the robot is close enough to climb. */
+        public static final double kClimbAreaThreshold = 5.0;
+
+        /** Forward drive speed (m/s) while approaching the climb bar. */
+        public static final double kApproachSpeed = 0.4;
+
+        /** Maximum rotation speed (rad/s) allowed during Limelight alignment. */
+        public static final double kMaxRotationSpeed = 1.0;
+
+        /** Climber motor percent output during active climb [0, 1]. */
+        public static final double kClimbSpeed = 1.0;
+    }
 }
 
 
