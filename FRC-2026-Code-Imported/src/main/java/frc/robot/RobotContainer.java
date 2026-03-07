@@ -18,6 +18,7 @@ import edu.wpi.first.cscore.VideoSink;
 import edu.wpi.first.cscore.VideoSource;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.OIConstants;
+import frc.robot.commands.AutoClimbCmd;
 import frc.robot.commands.SwerveJoystickCmd;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.commands.resetheading;
@@ -109,6 +110,9 @@ public class RobotContainer {
                                 () -> -driverJoytick.getRawAxis(OIConstants.kDriverXAxis),
                                 () -> LimelightHelpers.getTX("limelight") *-0.019,
                                 () -> !driverJoytick.getRawButton(OIConstants.kDriverFieldOrientedButtonIdx)));
+                // Hold the Start button on the operator controller to auto-climb using Limelight.
+                new JoystickButton(operatorJoytick, XboxController.Button.kStart.value)
+                        .whileTrue(new AutoClimbCmd(swerveSubsystem, climber));
           
         }
 
