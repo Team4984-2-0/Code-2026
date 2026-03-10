@@ -29,8 +29,14 @@ import frc.robot.commands.SetLimelightPipeline2;
 import frc.robot.commands.SetLimelightPipeline3;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Launcher;
-
 import frc.robot.subsystems.Intake;
+import frc.robot.commands.In;
+
+
+import frc.robot.subsystems.Arm;
+import frc.robot.commands.ArmDown;
+import frc.robot.commands.ArmUp;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -43,7 +49,10 @@ public class RobotContainer {
   private final Climber climber = new Climber();
 
   /** Articulated arm for scoring/collecting pieces. */
-  private final Intake intake = new Intake();
+  private final Arm arm = new Arm();
+
+    private final Intake intake = new Intake();
+
 
   /** Launcher/shooter for game-specific notes. */
   private final Launcher launcher = new Launcher();
@@ -121,13 +130,21 @@ public class RobotContainer {
         new JoystickButton(driverJoytick, 4).whileTrue(new LimelightTagFollow(swerveSubsystem));
 
 
-
+//best code
 
     //////////////////////////////// Operator Controller ////////////////////////////////
 
+    //Intake
+        new JoystickButton(operatorJoytick, 7).whileTrue(new In(intake));
+
+    //Arm
+        new JoystickButton(operatorJoytick, 11).whileTrue(new ArmDown(arm));
+        new JoystickButton(operatorJoytick, 10).whileTrue(new ArmUp(arm));
+   
+
     // Climber
-       new JoystickButton(operatorJoytick, 2).whileTrue(new Climb(climber));
-       new JoystickButton(operatorJoytick, 1).whileTrue(new ClimbDown(climber));
+       new JoystickButton(operatorJoytick, 1).whileTrue(new Climb(climber));
+       new JoystickButton(operatorJoytick, 2).whileTrue(new ClimbDown(climber));
 
     // Line Up with Climber: only if AprilTag 16 is visible
        Trigger tag16Visible = new Trigger(() -> getTid() == 16);

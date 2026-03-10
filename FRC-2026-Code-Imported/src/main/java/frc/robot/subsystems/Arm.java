@@ -13,23 +13,25 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
-public class Intake extends SubsystemBase {
-    private final RelativeEncoder IntakeEncoder;
+public class Arm extends SubsystemBase {
+    private final RelativeEncoder armEncoder;
     private SparkMax climbMotor;
+        private SparkMax climbMotor2;
 
 
     /** Initializes the climb motor and idle mode. */
-    public Intake() {
+    public Arm() {
         SparkMaxConfig elevatorConfig = new SparkMaxConfig();
         elevatorConfig.idleMode(SparkBaseConfig.IdleMode.kBrake);
-        climbMotor = new SparkMax(12, MotorType.kBrushless);
-        IntakeEncoder = climbMotor.getEncoder();
+        climbMotor = new SparkMax(10, MotorType.kBrushless);
+        climbMotor2 = new SparkMax(11, MotorType.kBrushless);
+        armEncoder = climbMotor.getEncoder();
 
     }
 
     /** Spins the climb motor at the provided percent output, with safety and readjustment logic. */
     public void Spin(double value) {
-   //     double position = IntakeEncoder.getPosition();
+   //     double position = armEncoder.getPosition();
     //    double effectiveValue = value;
      //   double maximum = 1.0;
      //   double minimum = 0;
@@ -40,6 +42,7 @@ public class Intake extends SubsystemBase {
      //   else if (position < maximum && position > minimum) {climbMotor.set(effectiveValue);}
      //   else {
             climbMotor.set(value);
+             climbMotor2.set(value);
 
         //}
 
@@ -51,11 +54,12 @@ public class Intake extends SubsystemBase {
     public void Spin() {
         
         climbMotor.set(0);
+        climbMotor2.set(0);
 
 
     }
 public double get_encoderClimb(){
-    return IntakeEncoder.getPosition();
+    return armEncoder.getPosition();
 }
 
 }
