@@ -14,48 +14,51 @@ import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class Intake extends SubsystemBase {
-    private final RelativeEncoder IntakeEncoder;
-    private SparkMax climbMotor;
+    private final RelativeEncoder LeftArmEncoder;
+    private final RelativeEncoder RightArmEncoder;
+    private SparkMax LeftArm;
+    private SparkMax RightArm;
+    private SparkMax RollerMotor;
+    
 
 
     /** Initializes the climb motor and idle mode. */
     public Intake() {
         SparkMaxConfig elevatorConfig = new SparkMaxConfig();
         elevatorConfig.idleMode(SparkBaseConfig.IdleMode.kBrake);
-        climbMotor = new SparkMax(12, MotorType.kBrushless);
-        IntakeEncoder = climbMotor.getEncoder();
+        RollerMotor = new SparkMax(12, MotorType.kBrushless);
+        LeftArm = new SparkMax(10, MotorType.kBrushless);
+        RightArm = new SparkMax(11, MotorType.kBrushless);
+        LeftArmEncoder = LeftArm.getEncoder();
+        RightArmEncoder = RightArm.getEncoder();
 
     }
 
     /** Spins the climb motor at the provided percent output, with safety and readjustment logic. */
-    public void Spin(double value) {
-   //     double position = IntakeEncoder.getPosition();
-    //    double effectiveValue = value;
-     //   double maximum = 1.0;
-     //   double minimum = 0;
-//
 
-     //   if (position < 0 && effectiveValue > 0) {climbMotor.set(effectiveValue);}
-     //   else if (position > maximum && effectiveValue < 0) {climbMotor.set(effectiveValue);}
-     //   else if (position < maximum && position > minimum) {climbMotor.set(effectiveValue);}
-     //   else {
-            climbMotor.set(value);
-
-        //}
-
-        //climbMotor.set(effectiveValue);
-    //    SmartDashboard.putNumber("encoder elevator", get_encoderClimb());
+    public void MoveArm(double value) {
+        LeftArm.set(value);
+        RightArm.set(value);
+    }
+    public void SpinRoller(double value) {
+        RollerMotor.set(value);         
     }
 
-    /** Stops the climb motor. */
-    public void Spin() {
-        
-        climbMotor.set(0);
+    public void StopRoller() {
+        RollerMotor.set(0);         
+    }       
 
+    public void StopArm() {
+        LeftArm.set(0);
+        RightArm.set(0);
+    }   
+
+    public double get_encoderLeft(){
+    return LeftArmEncoder.getPosition();
 
     }
-public double get_encoderClimb(){
-    return IntakeEncoder.getPosition();
-}
+    public double get_encoderRight(){
+    return RightArmEncoder.getPosition();       
 
+    }
 }

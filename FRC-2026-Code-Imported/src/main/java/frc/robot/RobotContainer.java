@@ -30,10 +30,7 @@ import frc.robot.commands.SetLimelightPipeline3;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Launcher;
 import frc.robot.subsystems.Intake;
-import frc.robot.commands.In;
-
-
-import frc.robot.subsystems.Arm;
+import frc.robot.commands.RollerOn;
 import frc.robot.commands.ArmDown;
 import frc.robot.commands.ArmUp;
 
@@ -49,7 +46,6 @@ public class RobotContainer {
   private final Climber climber = new Climber();
 
   /** Articulated arm for scoring/collecting pieces. */
-  private final Arm arm = new Arm();
 
     private final Intake intake = new Intake();
 
@@ -135,11 +131,11 @@ public class RobotContainer {
     //////////////////////////////// Operator Controller ////////////////////////////////
 
     //Intake
-        new JoystickButton(operatorJoytick, 7).whileTrue(new In(intake));
+        new JoystickButton(operatorJoytick, 7).whileTrue(new RollerOn(intake));
 
     //Arm
-        new JoystickButton(operatorJoytick, 11).whileTrue(new ArmDown(arm));
-        new JoystickButton(operatorJoytick, 10).whileTrue(new ArmUp(arm));
+        new JoystickButton(operatorJoytick, 11).whileTrue(new ArmDown(intake));
+        new JoystickButton(operatorJoytick, 10).whileTrue(new ArmUp(intake));
    
 
     // Climber
