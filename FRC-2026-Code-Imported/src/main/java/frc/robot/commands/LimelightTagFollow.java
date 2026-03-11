@@ -134,8 +134,8 @@ public class LimelightTagFollow extends Command {
                 VisionConstants.kAimMaxAngularSpeedRadPerSec);
         // Feed robot-relative speeds directly into the subsystem helper.
         ChassisSpeeds robotRelativeSpeeds = new ChassisSpeeds(
-                forwardSpeed,
-                strafeSpeed,
+                -forwardSpeed,
+                -strafeSpeed,
                 turningSpeed);
         swerveSubsystem.driveRobotRelative(robotRelativeSpeeds);
     }
