@@ -44,6 +44,14 @@ public class Climber extends SubsystemBase {
         //climbMotor.set(effectiveValue);
         SmartDashboard.putNumber("encoder elevator", get_encoderClimb());
     }
+    public void manSpin(double value) {
+      
+            climbMotor.set(value);
+
+
+        //climbMotor.set(effectiveValue);
+        SmartDashboard.putNumber("encoder elevator", get_encoderClimb());
+    }
 
     /** Stops the climb motor. */
     public void Spin() {

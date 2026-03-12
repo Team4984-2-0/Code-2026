@@ -19,6 +19,7 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.commands.SwerveJoystickCmd;
 import frc.robot.commands.Climb;
 import frc.robot.commands.ClimbDown;
+import frc.robot.commands.ClimbDownMan;
 import frc.robot.commands.LimelightAutoAim;
 import frc.robot.commands.LimelightTagFollow;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -145,15 +146,17 @@ public class RobotContainer {
     // Climber
        new JoystickButton(operatorJoytick, 1).whileTrue(new Climb(climber));
        new JoystickButton(operatorJoytick, 2).whileTrue(new ClimbDown(climber));
+       new JoystickButton(operatorJoytick, 3).whileTrue(new ClimbDownMan(climber));
+
 
     // Line Up with Climber: only if AprilTag 16 is visible
-       Trigger tag16Visible = new Trigger(() -> getTid() == 16);
-       tag16Visible.and(new JoystickButton(operatorJoytick, 3)).whileTrue(new LimelightAutoAim(
+       Trigger tag16Visible = new Trigger(() -> getTid() == 11);
+       tag16Visible.and(new JoystickButton(operatorJoytick, 12)).whileTrue(new LimelightAutoAim(
         swerveSubsystem,
         () -> -operatorJoytick.getRawAxis(OIConstants.kDriverYAxis),
         () -> -operatorJoytick.getRawAxis(OIConstants.kDriverXAxis),
         () -> !operatorJoytick.getRawButton(OIConstants.kDriverFieldOrientedButtonIdx)));
-       tag16Visible.and(new JoystickButton(operatorJoytick, 3)).whileTrue(new LimelightTagFollow(swerveSubsystem));
+       tag16Visible.and(new JoystickButton(operatorJoytick, 12)).whileTrue(new LimelightTagFollow(swerveSubsystem));
 
 
     // Swapping Diffrent LimeLight PipeLines
@@ -170,5 +173,4 @@ public class RobotContainer {
     // pre-loaded auto/path
     return autoChooser.getSelected();
   }
-
 }
