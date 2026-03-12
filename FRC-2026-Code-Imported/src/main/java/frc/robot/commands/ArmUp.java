@@ -1,24 +1,24 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.Intake;
 
 public class ArmUp extends Command {
     
-    private Arm climber;
+    private Intake arm;
 
-    public ArmUp(Arm climber) {
-        this.climber = climber;
-        addRequirements(climber);
+    public ArmUp(Intake intake) {
+        this.arm = intake;
+        addRequirements(intake);
     }
 
     @Override
     public void execute() {
-        climber.Spin(0.2);
+        arm.MoveArm(0.5);
     }
 
     @Override
     public void end(boolean interrupted) {
-        climber.Spin(0);
+        arm.StopArm();
     }
 }
