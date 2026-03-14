@@ -20,6 +20,7 @@ import frc.robot.commands.SwerveJoystickCmd;
 import frc.robot.commands.Climb;
 import frc.robot.commands.ClimbDown;
 import frc.robot.commands.ClimbDownMan;
+import frc.robot.commands.Launch;
 import frc.robot.commands.LimelightAutoAim;
 import frc.robot.commands.LimelightTagFollow;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -34,6 +35,7 @@ import frc.robot.subsystems.Intake;
 import frc.robot.commands.RollerOn;
 import frc.robot.commands.ArmDown;
 import frc.robot.commands.ArmUp;
+import frc.robot.commands.Cleanup;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -50,6 +52,7 @@ public class RobotContainer {
 
     private final Intake intake = new Intake();
 
+    public double batteryVoltage = 0.0;
 
   /** Launcher/shooter for game-specific notes. */
   private final Launcher launcher = new Launcher();
@@ -73,6 +76,8 @@ public class RobotContainer {
     autoChooser = AutoBuilder.buildAutoChooser();
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
+
+    SmartDashboard.putNumber("Battery Volage", batteryVoltage);
 
     // m_Chooser.setDefaultOption("Auto Command", getAutonomousCommand());
     SmartDashboard.putData("Auto Mode", m_Chooser);
@@ -115,6 +120,7 @@ public class RobotContainer {
     /// 
     // Reset Heading
        new JoystickButton(driverJoytick, 2).whileTrue(new resetheading(swerveSubsystem));
+       new JoystickButton(driverJoytick, 5).whileTrue(new Launch(launcher));
 
    // Automatically Aiming with Limelight
        new JoystickButton(driverJoytick, 3).whileTrue(new LimelightAutoAim(
@@ -126,13 +132,17 @@ public class RobotContainer {
     // Automatically Driving with Limelight
         new JoystickButton(driverJoytick, 4).whileTrue(new LimelightTagFollow(swerveSubsystem));
 
-
+    
 //best code
 
     //////////////////////////////// Operator Controller ////////////////////////////////
 
+    //Launcher
+        new JoystickButton(operatorJoytick, 8).whileTrue(new Launch(launcher));
+        new JoystickButton(operatorJoytick, 5).whileTrue(new Cleanup(launcher));
+
     //Intake
-        new JoystickButton(operatorJoytick, 7).whileTrue(new RollerOn(intake));
+        new JoystickButton(operatorJoytick, 9).whileTrue(new RollerOn(intake));
 
     //Arm
         new JoystickButton(operatorJoytick, 11).whileTrue(new ArmDown(intake));
@@ -168,5 +178,6 @@ public class RobotContainer {
     // to first load your paths/autos when code starts, then return the
     // pre-loaded auto/path
     return autoChooser.getSelected();
+
   }
 }

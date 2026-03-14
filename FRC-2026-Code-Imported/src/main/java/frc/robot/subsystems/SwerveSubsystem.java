@@ -248,6 +248,9 @@ public class SwerveSubsystem extends SubsystemBase {
     SmartDashboard.putString("Robot Location", getPose().getTranslation().toString());
     SmartDashboard.putNumber("odometer X", getPose().getX());
     SmartDashboard.putNumber("odometer Y", getPose().getY());
+
+    //  SmartDashboard.putNumber("Battery Volage", batteryVoltage);
+
   }
 
   /** Immediately halts all swerve modules. */

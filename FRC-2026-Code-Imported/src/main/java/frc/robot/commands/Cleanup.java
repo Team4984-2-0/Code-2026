@@ -17,16 +17,14 @@ public class Cleanup extends Command {
             addRequirements(LauncherSubsystem);
         }
         @Override
-        public void execute(){
-
-
-            LauncherSubsystem.ShootRun(LauncherPower);
-            ShooterCounter++;
-            if (ShooterCounter > StartHopperRunCount) 
-              LauncherSubsystem.HopperRun(HopperPower);
-            if (ShooterCounter > StartFeedRunCount)  
-                LauncherSubsystem.FeedRun(FeedPower);
-        }
+           public void execute() {
+      //  LauncherSubsystem.ShootRun(0.7);
+      
+   
+           LauncherSubsystem.HopperRun(.2);
+      
+           // LauncherSubsystem.FeedRun(-.60);
+    }
         @Override
         public void end(boolean interrupted){
             LauncherSubsystem.Killswitch();

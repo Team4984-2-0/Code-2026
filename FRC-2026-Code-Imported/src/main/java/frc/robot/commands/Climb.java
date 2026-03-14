@@ -14,7 +14,7 @@ public class Climb extends Command {
 
     @Override
     public void execute() {
-        climber.Spin(0.4);
+        climber.Spin(0.6);
     }
 
     @Override

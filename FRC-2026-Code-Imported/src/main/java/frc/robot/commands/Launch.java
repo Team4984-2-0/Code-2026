@@ -16,12 +16,12 @@ public class Launch extends Command {
 
     @Override
     public void execute() {
-        LauncherSubsystem.ShootRun(-0.20);
+        LauncherSubsystem.ShootRun(1);
         ShooterCounter++;
         if (ShooterCounter > StartHopperRunCount) // 1 second
-            LauncherSubsystem.HopperRun(-0.20);
+            LauncherSubsystem.HopperRun(.2);
         if (ShooterCounter > StartFeedRunCount) // 1.5 seconds
-            LauncherSubsystem.FeedRun(-0.20);
+            LauncherSubsystem.FeedRun(-.80);
     }
 
     @Override
