@@ -36,6 +36,7 @@ import frc.robot.commands.RollerOn;
 import frc.robot.commands.ArmDown;
 import frc.robot.commands.ArmUp;
 import frc.robot.commands.Cleanup;
+import frc.robot.commands.LimelightLaunch;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -121,6 +122,7 @@ public class RobotContainer {
     // Reset Heading
        new JoystickButton(driverJoytick, 2).whileTrue(new resetheading(swerveSubsystem));
        new JoystickButton(driverJoytick, 5).whileTrue(new Launch(launcher));
+       new JoystickButton(driverJoytick, 6).whileTrue(new LimelightLaunch(launcher));
 
    // Automatically Aiming with Limelight
        new JoystickButton(driverJoytick, 3).whileTrue(new LimelightAutoAim(

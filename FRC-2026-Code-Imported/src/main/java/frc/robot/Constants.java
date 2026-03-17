@@ -157,6 +157,18 @@ public class Constants {
         public static final double kTagFollowMaxLinearAccelerationMetersPerSecondSquared = 3.0;
         /** Distance error threshold (m) considered good enough for both X and Y axes. */
         public static final double kTagFollowTranslationalToleranceMeters = 0.05;
+
+        // ---- Distance-based launcher constants ----
+        /** Closest distance (m) at which we shoot – uses minimum power. */
+        public static final double kLaunchMinDistanceMeters = 1.0;
+        /** Farthest distance (m) we expect to shoot from – uses maximum power. */
+        public static final double kLaunchMaxDistanceMeters = 5.0;
+        /** Motor power at the closest range. Tune on the real robot. */
+        public static final double kLaunchMinPower = 0.45;
+        /** Motor power at the farthest range. Tune on the real robot. */
+        public static final double kLaunchMaxPower = 1.0;
+        /** Fallback power used when the Limelight has no target. */
+        public static final double kLaunchDefaultPower = 0.83;
     }
     
     public static final class UnitConversions {
