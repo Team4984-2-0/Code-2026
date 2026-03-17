@@ -6,8 +6,8 @@ import frc.robot.subsystems.Launcher;
 public class Launch extends Command {
     private Launcher LauncherSubsystem;
     private static int ShooterCounter = 0;
-    private static int StartHopperRunCount = 30;
-    private static int StartFeedRunCount = 30;
+    private static int StartHopperRunCount = 40;
+    private static int StartFeedRunCount = 55;
 
     public Launch(Launcher LauncherSubsystem) {
         this.LauncherSubsystem = LauncherSubsystem;
@@ -16,16 +16,17 @@ public class Launch extends Command {
 
     @Override
     public void execute() {
-        LauncherSubsystem.ShootRun(1);
+        LauncherSubsystem.ShootRun(0.83);
         ShooterCounter++;
         if (ShooterCounter > StartHopperRunCount) // 1 second
-            LauncherSubsystem.HopperRun(.2);
+          {  LauncherSubsystem.HopperRun(.2);}
         if (ShooterCounter > StartFeedRunCount) // 1.5 seconds
-            LauncherSubsystem.FeedRun(-.80);
+           { LauncherSubsystem.FeedRun(-.80);}
     }
 
     @Override
     public void end(boolean interrupted) {
+        ShooterCounter = 0;
         LauncherSubsystem.Killswitch();
     }
 
