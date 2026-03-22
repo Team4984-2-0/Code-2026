@@ -28,8 +28,8 @@ public class LimelightLaunch extends Command {
     private int shooterCounter = 0;
 
     /** Cycle counts before hopper and feed engage (same cadence as Launch). */
-    private static final int START_HOPPER_COUNT = 40;
-    private static final int START_FEED_COUNT   = 55;
+    private static final int START_HOPPER_COUNT = 75;
+    private static final int START_FEED_COUNT   = 75;
 
     /** The shooter power we computed at the start of this press. */
     private double targetShooterPower = VisionConstants.kLaunchDefaultPower;
@@ -48,7 +48,7 @@ public class LimelightLaunch extends Command {
     public void initialize() {
         shooterCounter = 0;
         targetShooterPower = computeShooterPower();
-        SmartDashboard.putNumber("LimelightLaunch/Power", targetShooterPower);
+        //SmartDashboard.putNumber("LimelightLaunch/Power", targetShooterPower);
     }
 
     @Override

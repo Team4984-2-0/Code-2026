@@ -13,13 +13,13 @@
         {
           "type": "named",
           "data": {
-            "name": "swapPipeline"
+            "name": "AutoAdjustLauncher_5s"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "2"
+            "pathName": "Copy of Copy of 1"
           }
         }
       ]

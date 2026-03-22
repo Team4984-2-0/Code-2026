@@ -75,23 +75,23 @@ public class LimelightAutoAim extends Command {
         ySpeed = yLimiter.calculate(ySpeed) * DriveConstants.kTeleDriveMaxSpeedMetersPerSecond;
 
         double turningSpeed = 0.0;
-        if (LimelightHelpers.getTV(limelightName)) {
+        //if (LimelightHelpers.getTV(limelightName)) {
             double txRadians = Units.degreesToRadians(LimelightHelpers.getTX(limelightName));
             turningSpeed = aimController.calculate(txRadians, 0.0);
-        } else {
-            aimController.reset();
-        }
+        //} else {
+        //    aimController.reset();
+        //}
 
-    turningSpeed = MathUtil.clamp(turningSpeed,
-        -VisionConstants.kAimMaxAngularSpeedRadPerSec,
-        VisionConstants.kAimMaxAngularSpeedRadPerSec);
+    //turningSpeed = MathUtil.clamp(turningSpeed,
+    //    -VisionConstants.kAimMaxAngularSpeedRadPerSec,
+    //    VisionConstants.kAimMaxAngularSpeedRadPerSec);
 
         ChassisSpeeds chassisSpeeds;
         if (fieldOrientedSupplier.get()) {
             chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                     xSpeed, ySpeed, turningSpeed, swerveSubsystem.getRotation2d());
         } else {
-            chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, turningSpeed);
+            chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, turningSpeed * 5);
         }
 
         SwerveModuleState[] moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);

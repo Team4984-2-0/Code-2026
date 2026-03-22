@@ -130,8 +130,6 @@ public class Constants {
     }
 
     public static final class VisionConstants {
-        /** NetworkTables name configured on the primary Limelight. */
-        public static final String kPrimaryLimelightName = "limelight";
         /** PID controller gains for auto-aim (units are radians). */
         public static final double kAimKp = 5.5;
         public static final double kAimKi = 0.0;
@@ -160,15 +158,32 @@ public class Constants {
 
         // ---- Distance-based launcher constants ----
         /** Closest distance (m) at which we shoot – uses minimum power. */
-        public static final double kLaunchMinDistanceMeters = 1.0;
+        public static final double kLaunchMinDistanceMeters = 2.3;
         /** Farthest distance (m) we expect to shoot from – uses maximum power. */
-        public static final double kLaunchMaxDistanceMeters = 5.0;
+        public static final double kLaunchMaxDistanceMeters = 4.5;
         /** Motor power at the closest range. Tune on the real robot. */
-        public static final double kLaunchMinPower = 0.45;
+        public static final double kLaunchMinPower = 0.63;
         /** Motor power at the farthest range. Tune on the real robot. */
-        public static final double kLaunchMaxPower = 1.0;
+        public static final double kLaunchMaxPower = 0.83;
         /** Fallback power used when the Limelight has no target. */
-        public static final double kLaunchDefaultPower = 0.83;
+        public static final double kLaunchDefaultPower = 0.70;
+
+        // PID gains for LimelightAlignAdvance
+        public static final double kAlignAdvanceXP = 1.8;   // tune on robot
+        public static final double kAlignAdvanceZP = 1.4;   // tune on robot
+
+        // Tolerances in meters
+        public static final double kAlignAdvanceXToleranceMeters = 0.05;
+        public static final double kAlignAdvanceZToleranceMeters = 0.08;
+
+        // Max translation speed used by LimelightAlignAdvance (m/s)
+        public static final double kAlignAdvanceMaxSpeedMetersPerSecond = 1.2;
+
+        // Desired camera-space Z distance to stop at (meters)
+        public static final double kAlignAdvanceGoalZMeters = 1.5;
+
+        // Limelight table name
+        public static final String kPrimaryLimelightName = "limelight";
     }
     
     public static final class UnitConversions {

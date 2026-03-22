@@ -25,6 +25,7 @@ import frc.robot.commands.LimelightAutoAim;
 import frc.robot.commands.LimelightTagFollow;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.commands.resetheading;
+import frc.robot.commands.thingspin;
 import frc.robot.commands.SetLimelightPipeline0;
 import frc.robot.commands.SetLimelightPipeline1;
 import frc.robot.commands.SetLimelightPipeline2;
@@ -37,6 +38,9 @@ import frc.robot.commands.ArmDown;
 import frc.robot.commands.ArmUp;
 import frc.robot.commands.Cleanup;
 import frc.robot.commands.LimelightLaunch;
+import frc.robot.commands.AlignToTagCustomValues;
+import frc.robot.commands.AutoClimb;
+import edu.wpi.first.wpilibj2.command.Commands;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -75,6 +79,13 @@ public class RobotContainer {
   public RobotContainer() {
 
     autoChooser = AutoBuilder.buildAutoChooser();
+
+    // Auto option: run auto-adjusting launcher for 5 seconds
+    Command autoAdjustLauncher5s = Commands.deadline(
+        Commands.waitSeconds(5.0),
+        new LimelightLaunch(launcher)
+    );
+    autoChooser.addOption("AutoAdjustLauncher_5s", autoAdjustLauncher5s);
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
@@ -119,20 +130,22 @@ public class RobotContainer {
 
     //////////////////////////////// Driver Controller ////////////////////////////////
     /// 
+    /// 
+    /// 
+    /// 
+ 
     // Reset Heading
        new JoystickButton(driverJoytick, 2).whileTrue(new resetheading(swerveSubsystem));
-       new JoystickButton(driverJoytick, 5).whileTrue(new Launch(launcher));
-       new JoystickButton(driverJoytick, 6).whileTrue(new LimelightLaunch(launcher));
 
    // Automatically Aiming with Limelight
-       new JoystickButton(driverJoytick, 3).whileTrue(new LimelightAutoAim(
+       new JoystickButton(driverJoytick, 1).whileTrue(new LimelightAutoAim(
         swerveSubsystem,
         () -> -driverJoytick.getRawAxis(OIConstants.kDriverYAxis),
         () -> -driverJoytick.getRawAxis(OIConstants.kDriverXAxis),
         () -> !driverJoytick.getRawButton(OIConstants.kDriverFieldOrientedButtonIdx)));
     
     // Automatically Driving with Limelight
-        new JoystickButton(driverJoytick, 4).whileTrue(new LimelightTagFollow(swerveSubsystem));
+    
 
     
 //best code
@@ -143,8 +156,15 @@ public class RobotContainer {
         new JoystickButton(operatorJoytick, 8).whileTrue(new Launch(launcher));
         new JoystickButton(operatorJoytick, 5).whileTrue(new Cleanup(launcher));
 
+       new JoystickButton(operatorJoytick, 6).whileTrue(new LimelightLaunch(launcher));
+
+
+
+
     //Intake
         new JoystickButton(operatorJoytick, 9).whileTrue(new RollerOn(intake));
+             new JoystickButton(operatorJoytick, 9).whileTrue(new thingspin(launcher));
+//
 
     //Arm
         new JoystickButton(operatorJoytick, 11).whileTrue(new ArmDown(intake));
@@ -152,28 +172,19 @@ public class RobotContainer {
    
 
     // Climber
+    new JoystickButton(operatorJoytick, 12).toggleOnTrue(new AutoClimb(swerveSubsystem));   
+    new JoystickButton(operatorJoytick, 12).toggleOnTrue(new Climb(climber));
+
+
+
        new JoystickButton(operatorJoytick, 1).whileTrue(new Climb(climber));
        new JoystickButton(operatorJoytick, 2).whileTrue(new ClimbDown(climber));
        new JoystickButton(operatorJoytick, 3).whileTrue(new ClimbDownMan(climber));
 
 
-    // Line Up with Climber: only if AprilTag 16 is visible
-       Trigger tag16Visible = new Trigger(() -> getTid() == 11);
-       tag16Visible.and(new JoystickButton(operatorJoytick, 12)).whileTrue(new LimelightAutoAim(
-        swerveSubsystem,
-        () -> -operatorJoytick.getRawAxis(OIConstants.kDriverYAxis),
-        () -> -operatorJoytick.getRawAxis(OIConstants.kDriverXAxis),
-        () -> !operatorJoytick.getRawButton(OIConstants.kDriverFieldOrientedButtonIdx)));
-       tag16Visible.and(new JoystickButton(operatorJoytick, 12)).whileTrue(new LimelightTagFollow(swerveSubsystem));
-
-
-    // Swapping Diffrent LimeLight PipeLines
-       // new JoystickButton(operatorJoytick, 1).whileTrue(new Climb(climber));
- 
-    // new JoystickButton(operatorJoytick, 6).whileTrue(new Launch(launcher));
-    // new JoystickButton(operatorJoytick, 7).whileTrue(new Intake(launcher));
-    
-
+    new JoystickButton(operatorJoytick, 7).whileTrue(
+        new AlignToTagCustomValues(swerveSubsystem, 11, -22.77, -1.11, 2.053)
+    );
   }
   public Command getAutonomousCommand() {
     // This method loads the auto when it is called, however, it is recommended

@@ -98,46 +98,60 @@ public class LimelightTagFollow extends Command {
 
         Pose3d targetPose = LimelightHelpers.getTargetPose3d_CameraSpace(limelightName);
         double forwardMeters = targetPose.getX();
-        double leftMeters = targetPose.getY();
+        double leftMeters = targetPose.getZ();
+        //double zvalue = targetPose.getz();
         SmartDashboard.putBoolean("TagFollow/HasTarget", true);
         SmartDashboard.putNumber("TagFollow/ForwardMeters", forwardMeters);
         SmartDashboard.putNumber("TagFollow/LeftMeters", leftMeters);
+        //SmartDashboard.putNumber("TagFollow/z", zvalue);
 
-        // PID controllers operate in camera-space meters: X is forward, Y is left.
-        double forwardCommand = -forwardController.calculate(
-                forwardMeters,
-                VisionConstants.kTagFollowGoalXMeters);
-        double strafeCommand = -strafeController.calculate(
-                leftMeters,
-                VisionConstants.kTagFollowGoalYMeters);
+                
+                
+                // PID controllers operate in camera-space meters: X is forward, Y is left.
+                double forwardCommand = -forwardController.calculate(
+                        forwardMeters,
+                        VisionConstants.kTagFollowGoalXMeters);
+                double strafeCommand = -strafeController.calculate(
+                        leftMeters,
+                        VisionConstants.kTagFollowGoalYMeters);
 
-        // Rate-limit the outputs so the chassis does not lurch when the pose jumps.
-        double limitedForward = forwardLimiter.calculate(forwardCommand);
-        double limitedStrafe = strafeLimiter.calculate(strafeCommand);
+                // Rate-limit the outputs so the chassis does not lurch when the pose jumps.
+                double limitedForward = forwardLimiter.calculate(forwardCommand);
+                double limitedStrafe = strafeLimiter.calculate(strafeCommand);
 
-        double forwardSpeed = MathUtil.clamp(
-                limitedForward,
-                -VisionConstants.kTagFollowMaxLinearSpeedMetersPerSecond,
-                VisionConstants.kTagFollowMaxLinearSpeedMetersPerSecond);
-        double strafeSpeed = MathUtil.clamp(
-                limitedStrafe,
-                -VisionConstants.kTagFollowMaxLinearSpeedMetersPerSecond,
-                VisionConstants.kTagFollowMaxLinearSpeedMetersPerSecond);
+                double forwardSpeed = MathUtil.clamp(
+                        limitedForward,
+                        -VisionConstants.kTagFollowMaxLinearSpeedMetersPerSecond,
+                        VisionConstants.kTagFollowMaxLinearSpeedMetersPerSecond);
+                double strafeSpeed = MathUtil.clamp(
+                        limitedStrafe,
+                        -VisionConstants.kTagFollowMaxLinearSpeedMetersPerSecond,
+                        VisionConstants.kTagFollowMaxLinearSpeedMetersPerSecond);
 
-        double turningSpeed = 0.0;
-        // Use tx (horizontal pixel error) for yaw control instead of the 3D pose.
-        double txRadians = Units.degreesToRadians(LimelightHelpers.getTX(limelightName));
-        turningSpeed = aimController.calculate(txRadians, 0.0);
-        turningSpeed = MathUtil.clamp(
-                turningSpeed,
-                -VisionConstants.kAimMaxAngularSpeedRadPerSec,
-                VisionConstants.kAimMaxAngularSpeedRadPerSec);
-        // Feed robot-relative speeds directly into the subsystem helper.
-        ChassisSpeeds robotRelativeSpeeds = new ChassisSpeeds(
-                -forwardSpeed,
-                -strafeSpeed,
-                turningSpeed);
-        swerveSubsystem.driveRobotRelative(robotRelativeSpeeds);
+                double turningSpeed = 0.0;
+                // Use tx (horizontal pixel error) for yaw control instead of the 3D pose.
+                double txRadians = Units.degreesToRadians(LimelightHelpers.getTX(limelightName));
+                turningSpeed = aimController.calculate(txRadians, 0.0);
+                turningSpeed = MathUtil.clamp(
+                        turningSpeed,
+                        -VisionConstants.kAimMaxAngularSpeedRadPerSec,
+                        VisionConstants.kAimMaxAngularSpeedRadPerSec);
+                // Feed robot-relative speeds directly into the subsystem helper.
+                ChassisSpeeds robotRelativeSpeeds;
+                if(VisionConstants.kTagFollowGoalXMeters-.1 <= forwardCommand ||  VisionConstants.kTagFollowGoalXMeters+.3 >= forwardCommand){
+                  robotRelativeSpeeds = new ChassisSpeeds(
+                        -strafeSpeed,
+                        0,
+                        0);
+                }
+                else{
+                robotRelativeSpeeds = new ChassisSpeeds(
+                        0,
+                        -strafeCommand,
+                        turningSpeed);
+                }
+                swerveSubsystem.driveRobotRelative(robotRelativeSpeeds);
+                
     }
 
     @Override

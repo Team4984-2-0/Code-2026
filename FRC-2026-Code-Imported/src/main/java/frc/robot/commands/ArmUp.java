@@ -14,7 +14,7 @@ public class ArmUp extends Command {
 
     @Override
     public void execute() {
-        arm.MoveArm(0.5);
+        arm.MoveArm(0.1);
     }
 
     @Override
