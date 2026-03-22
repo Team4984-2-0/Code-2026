@@ -9,6 +9,8 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj.Joystick;
+import com.pathplanner.lib.auto.NamedCommands;
+
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -40,6 +42,8 @@ import frc.robot.commands.Cleanup;
 import frc.robot.commands.LimelightLaunch;
 import frc.robot.commands.AlignToTagCustomValues;
 import frc.robot.commands.AutoClimb;
+import frc.robot.commands.AutoLaunch;
+
 import edu.wpi.first.wpilibj2.command.Commands;
 
 import java.util.Timer;
@@ -80,14 +84,12 @@ public class RobotContainer {
 
     autoChooser = AutoBuilder.buildAutoChooser();
 
-    // Auto option: run auto-adjusting launcher for 5 seconds
-    Command autoAdjustLauncher5s = Commands.deadline(
-        Commands.waitSeconds(5.0),
-        new LimelightLaunch(launcher)
-    );
-    autoChooser.addOption("AutoAdjustLauncher_5s", autoAdjustLauncher5s);
-
+   
+    
     SmartDashboard.putData("Auto Chooser", autoChooser);
+
+    NamedCommands.registerCommand("AutoShoot", new AutoLaunch(launcher));
+
 
     SmartDashboard.putNumber("Battery Volage", batteryVoltage);
 

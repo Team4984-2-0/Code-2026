@@ -5,15 +5,15 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "1"
+            "name": "AutoShoot"
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "AutoAdjustLauncher_5s"
+            "pathName": "thinggg"
           }
         }
       ]
