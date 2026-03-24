@@ -63,10 +63,6 @@ public class AutoLaunch extends Command {
         // Recalculate power each cycle so it tracks if the robot is still moving
         targetShooterPower = computeShooterPower();
         SmartDashboard.putNumber("AutoLaunch/Power", targetShooterPower);
-
-        launcherSubsystem.ShootRun(targetShooterPower);
-        
-
         if (shooterCounter > START_HOPPER_COUNT) {
             launcherSubsystem.HopperRun(0.2);
         }
@@ -74,22 +70,23 @@ public class AutoLaunch extends Command {
             launcherSubsystem.FeedRun(-0.80);
         }
    // }
-    if(commandCounter > 200) {
-        shooterCounter = 0;
-        commandCounter = 0;
-        launcherSubsystem.Killswitch();
-    }
+
     shooterCounter++;
     commandCounter++;
 }
     @Override
     public void end(boolean interrupted) {
         shooterCounter = 0;
-                commandCounter = 0;
-
+        commandCounter = 0;
         launcherSubsystem.Killswitch();
     }
-
+    @Override
+    public boolean isFinished() {
+        if(commandCounter > 200) {
+            return true;
+        }
+        return false;
+    }
     // ---- helpers ----
 
     /**
