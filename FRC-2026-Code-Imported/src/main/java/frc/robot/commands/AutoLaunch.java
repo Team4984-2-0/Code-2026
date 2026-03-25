@@ -56,7 +56,7 @@ public class AutoLaunch extends Command {
 
     @Override
     public void execute() {
-      //  if(commandCounter < 200) {
+
             targetShooterPower = computeShooterPower();
             SmartDashboard.putNumber("AutoLaunch/Power", targetShooterPower);
         
@@ -73,17 +73,12 @@ public class AutoLaunch extends Command {
         if (shooterCounter > START_FEED_COUNT) {
             launcherSubsystem.FeedRun(-0.80);
         }
-   // }
-    if(commandCounter > 200) {
-        shooterCounter = 0;
-        commandCounter = 0;
-        launcherSubsystem.Killswitch();
-    }
-    shooterCounter++;
-    commandCounter++;
+
+   
 }
     @Override
     public void end(boolean interrupted) {
+        isFinished();
         shooterCounter = 0;
                 commandCounter = 0;
 

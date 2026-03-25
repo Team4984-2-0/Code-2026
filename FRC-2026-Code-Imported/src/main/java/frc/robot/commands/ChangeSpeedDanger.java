@@ -13,6 +13,8 @@ public class ChangeSpeedDanger extends Command {
         public void execute(){
             swerveSubsystem.maxspeed(3);
         }
+
+        // This should tripple the speed of the robot
         @Override
         public void end(boolean interrupted){
             
