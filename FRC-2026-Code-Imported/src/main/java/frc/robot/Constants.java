@@ -158,9 +158,9 @@ public class Constants {
 
         // ---- Distance-based launcher constants ----
         /** Closest distance (m) at which we shoot – uses minimum power. */
-        public static final double kLaunchMinDistanceMeters = 2.3;
+        public static final double kLaunchMinDistanceMeters = 2.1;
         /** Farthest distance (m) we expect to shoot from – uses maximum power. */
-        public static final double kLaunchMaxDistanceMeters = 4.5;
+        public static final double kLaunchMaxDistanceMeters = 4.7;
         /** Motor power at the closest range. Tune on the real robot. */
         public static final double kLaunchMinPower = 0.63;
         /** Motor power at the farthest range. Tune on the real robot. */

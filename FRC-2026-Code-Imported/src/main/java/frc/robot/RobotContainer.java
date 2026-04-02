@@ -10,6 +10,8 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj.Joystick;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.events.EventTrigger;
+
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -32,31 +34,30 @@ import frc.robot.commands.ChangeSpeedRegular;
 //Swerve
 import frc.robot.commands.SwerveJoystickCmd;
 import frc.robot.subsystems.SwerveSubsystem;
+import yams.mechanisms.positional.Arm;
 import frc.robot.commands.resetheading;
 
 //Limelight
 import frc.robot.commands.LimelightAutoAim;
 
 //////////Operator//////////
-
-//Climber
-import frc.robot.commands.Climb;
-import frc.robot.commands.ClimbDown;
-import frc.robot.commands.ClimbDownMan;
-import frc.robot.commands.AutoClimb;
-
 //Intake & Launcher
 import frc.robot.commands.Launch;
+import frc.robot.commands.atLaunch;
 import frc.robot.commands.thingspin;
-import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Launcher;
 import frc.robot.subsystems.Intake;
 import frc.robot.commands.RollerOn;
+import frc.robot.commands.RollerREV;
+import frc.robot.commands.RollerSlow;
+
 import frc.robot.commands.Cleanup;
+
 
 // Intake Arm
 import frc.robot.commands.ArmDown;
 import frc.robot.commands.ArmUp;
+import frc.robot.commands.AutoArm;
 
 
 //Limelight
@@ -70,8 +71,6 @@ public class RobotContainer {
   /** Primary swerve drivebase used in both teleop and auto. */
   private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
 
-  /** Placeholder climber subsystem (bindings can be re-enabled later). */
-  private final Climber climber = new Climber();
 
   /** Articulated arm for scoring/collecting pieces. */
 
@@ -98,18 +97,21 @@ public class RobotContainer {
    */
   public RobotContainer() {
 
-    autoChooser = AutoBuilder.buildAutoChooser();
-
-   
     
-    SmartDashboard.putData("Auto Chooser", autoChooser);
+    
+    
+        autoChooser = AutoBuilder.buildAutoChooser();
 
-    NamedCommands.registerCommand("AutoShoot", new AutoLaunch(launcher));
+    NamedCommands.registerCommand("AtLAUNCH", new atLaunch(launcher));
+    
+   // NamedCommands.registerCommand("AtARM", new AutoArm(intake));
 
+    
+    new EventTrigger("shootRun").onTrue(Commands.runOnce(() -> new Launch(launcher)));
 
     SmartDashboard.putNumber("Battery Volage", batteryVoltage);
-
-    // m_Chooser.setDefaultOption("Auto Command", getAutonomousCommand());
+    SmartDashboard.putData("Auto Chooser", autoChooser);
+    m_Chooser.setDefaultOption("Auto Command", getAutonomousCommand());
     SmartDashboard.putData("Auto Mode", m_Chooser);
     // Default teleop command: map joystick axes to field-oriented drive inputs.
     swerveSubsystem.setDefaultCommand(new SwerveJoystickCmd(
@@ -170,36 +172,26 @@ public class RobotContainer {
 
     //Launcher
         new JoystickButton(operatorJoytick, 8).whileTrue(new Launch(launcher));
-        new JoystickButton(operatorJoytick, 5).whileTrue(new Cleanup(launcher));
-
-       new JoystickButton(operatorJoytick, 6).whileTrue(new LimelightLaunch(launcher));
+        new JoystickButton(operatorJoytick, 6).whileTrue(new LimelightLaunch(launcher));
+           new JoystickButton(operatorJoytick, 8).whileTrue(new RollerSlow(intake));
+        new JoystickButton(operatorJoytick, 6).whileTrue(new RollerSlow(intake));
 
 
 
 
     //Intake
-        new JoystickButton(operatorJoytick, 9).whileTrue(new RollerOn(intake));
-             new JoystickButton(operatorJoytick, 9).whileTrue(new thingspin(launcher));
+        new JoystickButton(operatorJoytick, 7).whileTrue(new RollerOn(intake));
+                new JoystickButton(operatorJoytick, 7).whileTrue(new thingspin(launcher));
+
+                new JoystickButton(operatorJoytick, 5).whileTrue(new RollerREV(intake));
+
+        // this needs to be one command not two
+        //new JoystickButton(operatorJoytick, 7).whileTrue(new thingspin(launcher));
 
     //Arm
-        new JoystickButton(operatorJoytick, 11).whileTrue(new ArmDown(intake));
-        new JoystickButton(operatorJoytick, 10).whileTrue(new ArmUp(intake));
+        new JoystickButton(operatorJoytick, 4).whileTrue(new ArmDown(intake));
+        new JoystickButton(operatorJoytick, 3).whileTrue(new ArmUp(intake));
    
-
-    // Climber
-    new JoystickButton(operatorJoytick, 12).toggleOnTrue(new AutoClimb(swerveSubsystem));   
-    new JoystickButton(operatorJoytick, 12).toggleOnTrue(new Climb(climber));
-
-
-
-       new JoystickButton(operatorJoytick, 1).whileTrue(new Climb(climber));
-       new JoystickButton(operatorJoytick, 2).whileTrue(new ClimbDown(climber));
-       new JoystickButton(operatorJoytick, 3).whileTrue(new ClimbDownMan(climber));
-
-
-    new JoystickButton(operatorJoytick, 7).whileTrue(
-        new AlignToTagCustomValues(swerveSubsystem, 11, -22.77, -1.11, 2.053)
-    );
   }
   public Command getAutonomousCommand() {
     // This method loads the auto when it is called, however, it is recommended

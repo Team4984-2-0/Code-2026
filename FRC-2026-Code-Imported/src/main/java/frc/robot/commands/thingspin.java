@@ -17,12 +17,12 @@ public class thingspin extends Command {
 
     @Override
     public void execute() {
-        launcher.HopperRun(.2);
+        launcher.FeedRun(.2);
     }
 
     @Override
     public void end(boolean interrupted) {
-                launcher.HopperStop();
+                launcher.FeedStop();
 
     }
 }

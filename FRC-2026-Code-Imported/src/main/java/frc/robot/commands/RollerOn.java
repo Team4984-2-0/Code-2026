@@ -16,7 +16,7 @@ public class RollerOn extends Command {
 
     @Override
     public void execute() {
-        intake.SpinRoller(-0.4);
+        intake.SpinRoller(-0.38);
     }
 
     @Override

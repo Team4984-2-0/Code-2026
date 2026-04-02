@@ -56,6 +56,7 @@ public class AutoLaunch extends Command {
 
     @Override
     public void execute() {
+        isFinished();
       //  if(commandCounter < 200) {
             targetShooterPower = computeShooterPower();
             SmartDashboard.putNumber("AutoLaunch/Power", targetShooterPower);

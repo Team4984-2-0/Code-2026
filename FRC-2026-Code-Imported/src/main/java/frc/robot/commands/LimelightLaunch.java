@@ -61,10 +61,10 @@ public class LimelightLaunch extends Command {
         shooterCounter++;
 
         if (shooterCounter > START_HOPPER_COUNT) {
-            launcherSubsystem.HopperRun(0.2);
+            launcherSubsystem.HopperRun(0.7);
         }
         if (shooterCounter > START_FEED_COUNT) {
-            launcherSubsystem.FeedRun(-0.80);
+            launcherSubsystem.FeedRun(0.6);
         }
     }
 
